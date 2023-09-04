@@ -16,6 +16,6 @@ function animate(timeStamp) {
     game.draw(ctx);
     game.update(timeStamp,deltaTime);
    
-    requestAnimationFrame(animate);
+    if (!game.gameOver) requestAnimationFrame(animate);
 }
 animate(0);

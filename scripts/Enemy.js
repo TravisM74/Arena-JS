@@ -8,7 +8,8 @@ export class Enemy {
         this.meleeCombatRadius = 25;
         this.markedForDeletion = false;
         this.inCombat = false;
-        this.moveDistance = 30;
+        this.moveBase = 15;
+        this.moveVariance = 20;
         this.thac0Bonus = 0;
         this.level = 1;
         this.hitPoints = 5;
@@ -17,11 +18,13 @@ export class Enemy {
         this.moveTimer = 0;
         this.moveToX = 0;
         this.moveToY = 0;
+        this.attacks = 1;
         
-        this.x = Math.floor(Math.random() * this.game.WIDTH - this.width);
-        this.y = Math.floor(Math.random() * this.game.HEIGHT -this.height);
+        this.x = Math.floor(Math.random() * this.game.WIDTH - this.width );
+        this.y = Math.floor(Math.random() * this.game.HEIGHT -this.height );
         /* this.image = document.getElementById('skeleton1'); */
         this.healthBar = new HealthBar(this);
+        this.moveSpeed = Math.floor(Math.random() * this.moveVariance + this.moveBase);
     }
     draw(ctx){
         ctx.fillStyle = 'red';
@@ -44,16 +47,17 @@ export class Enemy {
         
     }
     update(deltaTime){
+        
         if (this.game.soundMode) this.sound1.play();
-        this.moveToX = this.x + Math.floor(Math.random() * this.moveDistance + 5);
-        this.moveToY = this.y + Math.floor(Math.random() * this.moveDistance + 5);
+        this.moveToX = this.x + this.moveSpeed;
+        this.moveToY = this.y + this.moveSpeed;
   
-        if (this.x < this.game.player.x) {
+        if ((this.x < this.game.player.x)) {
             this.x += this.moveToX / this.moveInterval;
         } else {
             this.x -= this.moveToX / this.moveInterval;
         }
-        if (this.y < this.game.player.y) {
+        if ((this.y < this.game.player.y)) {
             this.y += this.moveToY / this.moveInterval;
         } else {
             this.y -= this.moveToY / this.moveInterval;

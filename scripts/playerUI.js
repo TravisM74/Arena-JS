@@ -23,6 +23,7 @@ export class PlayerUI {
 
         context.fillStyle= 'black';
         context.fillText('Victories : ' + this.game.player.victories, this.startX , this.startY + 120);
+        context.fillText('Lives : ' + this.game.player.lives, this.startX , this.startY + 150);
         
     }
     update(time){

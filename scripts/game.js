@@ -22,6 +22,8 @@ export class Game {
         this.soundMode = false;
         this.enemyCount = 1
         this.enemies = [];
+
+        this.gameOver = false;
         
         this.meleeConflict = new MeleeConflict(this);
 
@@ -29,33 +31,43 @@ export class Game {
         restButton.onclick = (() => this.player.state='resting'); 
         const healthPotionButton = document.getElementById('health-potion-button');
         healthPotionButton.onclick = (()=> this.player.healWithPotion())
+       
     }
     update(timeStamp,deltaTime){
+        
         this.player.update(deltaTime);
         this.debugUI.update(timeStamp);
+        this.playerUI.update();
+        // end game condition
+        if (this.player.lives === 0) this.gameOver= true;
+        
+        // clearing dead enemies
         this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
+       
+        // updating UI
         this.hitUI.update(deltaTime);
+
+        //handeling player defeat
         if ((this.player.state === 'ko')||(this.player.state === 'resting' ) ){
             this.player.playerResting(deltaTime);
         } 
-        
-        //this.meleeConflict.update(this.player, this.enemy, deltaTime);
-        
+       
         //Adding Enemeies
         if(this.enemies.length < 1){
-            this.addSkeletonEnemies()
-        }
-        //Enemy move
+            this.addSkeletonEnemies();
+            //console.log(this.checkContact(this.player,this.enemies));
+        };
+        //Enemy Update
         this.enemies.forEach((e)=> {
             if (!e.inCombat) e.update(deltaTime);
             
-           /*  e.moveTimer += deltaTime;
-            if((e.moveTimer > e.moveInterval)&& (!e.inCombat) ) {
-                e.moveTimer = 0;
-                e.move();
-            } */
         });
-        this.playerUI.update();
+
+        //meleeCombatCheck
+        this.enemies.forEach((e)=>{
+            this.meleeConflict.checkMeleeContact(this.player, e, deltaTime);
+        });
+        
         
         
     }
@@ -77,5 +89,12 @@ export class Game {
         this.enemyCount++;
         
     }
+    checkContact(a,b){
+        const dx = a.x - b.x;
+       const dy = a.y - b.y;
+       const distance = Math.hypot(dy,dx);
+       const sumOfRadii = a.meleeCombatRadius + b.meleeCombatRadius ;
+       return [distance < sumOfRadii, a ,b];
+   }
     
 }

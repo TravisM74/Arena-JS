@@ -60,23 +60,23 @@ export class Player {
         if ((this.game.input.keys.indexOf('ArrowDown') > -1) && (this.state==='adventuring')) {
             this.y+= this.game.gameSpeed;
             this.facing='south';
-            this.walkingSound.play();
+            if (this.game.soundMode) this.walkingSound.play();
         }
         if ((this.game.input.keys.indexOf('ArrowRight') > -1) && (this.state==='adventuring')){
             this.x+= this.game.gameSpeed;
             this.facing='east';  
-            this.walkingSound.play();   
+            if (this.game.soundMode) this.walkingSound.play();   
         } 
         
         if ((this.game.input.keys.indexOf('ArrowLeft') > -1) && (this.state==='adventuring')) {
             this.x-= this.game.gameSpeed;
             this.facing='west';
-            this.walkingSound.play();
+            if (this.game.soundMode) this.walkingSound.play();
         }
         if ((this.game.input.keys.indexOf('ArrowUp') > -1)  && (this.state==='adventuring')){
             this.y-= this.game.gameSpeed;
             this.facing='north';
-            this.walkingSound.play();
+            if (this.game.soundMode) this.walkingSound.play();
         }
         //Boundries
         if (this.x > this.game.WIDTH) this.x = this.game.WIDTH;
@@ -84,10 +84,7 @@ export class Player {
         if (this.y < 0) this.y = 0;
         if (this.y > this.game.HEIGHT) this.y = this.game.HEIGHT;
 
-        //meleeCombatCheck
-        this.game.enemies.forEach((e)=>{
-            this.game.meleeConflict.update(this, e, deltaTime);
-        })
+        
     }
     playerResting(deltaTime){
         this.state='resting';
@@ -110,12 +107,14 @@ export class Player {
         this.y = this.game.HEIGHT /2;
         this.hitPoints = 10;
         this.thac0Bonus = 0;
+        this.lives= 3;
         this.maxHitPoints = 10;
         this.armourClass = 5;
         this.weaponDamage = 4;
         this.experiance = 0;
         this.victories = 0;
         this.knockOuts = 0;
+        this.attacks = 1;
         this.state = 'adventuring';
         this.inCombat = false;
         this.coins = 0;
