@@ -18,6 +18,8 @@ export class Game {
        
         this.gameSpeed = 1;
         this.debugMode = true; 
+        // sounds off by default 
+        this.soundMode = false;
         this.enemyCount = 1
         this.enemies = [];
         

@@ -59,10 +59,10 @@ class MeleeCombat {
                 this.damageGiven = Math.floor(Math.random() * a.weaponDamage)+1
                 b.hitPoints -= this.damageGiven;
                 //console.log(this.roll ,b);
-                hitSound1.play();
+                if (this.game.soundMode) hitSound1.play();
             } else {
                 //console.log(this.roll, 'miss', b);
-                missSound.play();
+                if (this.game.soundMode) missSound.play();
                 this.damageGiven = 0;
             }
             //Mob trys to hit player
@@ -71,11 +71,11 @@ class MeleeCombat {
                 this.damageTaken = Math.floor(Math.random() * b.weaponDamage)+1
                 a.hitPoints -= this.damageTaken;
                 //console.log(this.roll,a);
-                hitSound1.play();
+                if (this.game.soundMode) hitSound1.play();
             } else {
                 //console.log(this.roll, 'miss', a)
                 this.damageTaken = 0;
-                missSound2.play();
+                if (this.game.soundMode) missSound2.play();
             }
             // display Damage 
             this.game.hitUI.updateData(a, this.damageTaken, b ,this.damageGiven);

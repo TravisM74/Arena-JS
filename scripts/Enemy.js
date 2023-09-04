@@ -44,7 +44,7 @@ export class Enemy {
         
     }
     update(deltaTime){
-        this.sound1.play();
+        if (this.game.soundMode) this.sound1.play();
         this.moveToX = this.x + Math.floor(Math.random() * this.moveDistance + 5);
         this.moveToY = this.y + Math.floor(Math.random() * this.moveDistance + 5);
   

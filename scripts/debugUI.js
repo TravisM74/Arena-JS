@@ -22,6 +22,7 @@ export class DebugUI {
         context.fillText('Player XP : ' + this.game.player.experiance, this.startX , this.startY + 100);
         context.fillText('Player State : ' + this.game.player.state, this.startX , this.startY + 120);
         context.fillText('Player combat : ' + this.game.player.inCombat, this.startX , this.startY + 140);
+        context.fillText('Sounds : ' + this.game.soundMode, this.startX , this.startY + 160);
         context.restore();
 
     }

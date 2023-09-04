@@ -12,6 +12,7 @@ export class InputHandler{
                     this.keys.push(e.key);
                 } else {
                     if (e.key === 'd') this.game.debugMode = !this.game.debugMode ;
+                    if (e.key === 's') this.game.soundMode = !this.game.soundMode ;
                     if (e.key === 'r') this.game.player.state='resting';
                 }
         });
