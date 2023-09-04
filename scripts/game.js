@@ -1,0 +1,79 @@
+import {Player} from './player.js';
+import {InputHandler} from './input.js';
+import {DebugUI} from './debugUI.js';
+import {Enemy, Skeleton} from './Enemy.js';
+import {MeleeConflict} from './meleeconflict.js'
+import {HitUI} from './hitUI.js';
+import {PlayerUI} from './playerUI.js';
+import {EnemyUI} from './enemyUI.js';
+export class Game {
+    constructor(Canvas_Width, Canvas_Height){
+        this.HEIGHT = Canvas_Height;
+        this.WIDTH = Canvas_Width;
+        this.player = new Player(this);
+        this.input = new InputHandler(this);
+        this.debugUI = new DebugUI(this);
+        this.playerUI = new PlayerUI(this);
+        this.hitUI = new HitUI();
+       
+        this.gameSpeed = 1;
+        this.debugMode = true; 
+        this.enemyCount = 1
+        this.enemies = [];
+        
+        this.meleeConflict = new MeleeConflict(this);
+
+        const restButton = document.getElementById('rest-button');
+        restButton.onclick = (() => this.player.state='resting'); 
+        const healthPotionButton = document.getElementById('health-potion-button');
+        healthPotionButton.onclick = (()=> this.player.healWithPotion())
+    }
+    update(timeStamp,deltaTime){
+        this.player.update(deltaTime);
+        this.debugUI.update(timeStamp);
+        this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
+        this.hitUI.update(deltaTime);
+        if ((this.player.state === 'ko')||(this.player.state === 'resting' ) ){
+            this.player.playerResting(deltaTime);
+        } 
+        
+        //this.meleeConflict.update(this.player, this.enemy, deltaTime);
+        
+        //Adding Enemeies
+        if(this.enemies.length < 1){
+            this.addSkeletonEnemies()
+        }
+        //Enemy move
+        this.enemies.forEach((e)=> {
+            if (!e.inCombat) e.update(deltaTime);
+            
+           /*  e.moveTimer += deltaTime;
+            if((e.moveTimer > e.moveInterval)&& (!e.inCombat) ) {
+                e.moveTimer = 0;
+                e.move();
+            } */
+        });
+        this.playerUI.update();
+        
+        
+    }
+    draw(ctx){
+        this.player.draw(ctx);
+        this.enemies.forEach( (e) => {
+            e.draw(ctx)});
+        this.hitUI.draw(ctx);
+        this.playerUI.draw(ctx);
+        /* this.enemyUI.draw(ctx); */
+        if (this.debugMode) this.debugUI.draw(ctx);
+
+    }
+    addSkeletonEnemies(){
+        for(let i = 0 ; i < this.enemyCount ; i++){
+            this.enemies.push(new Skeleton(this));   
+        }
+        document.getElementById('wave-count').innerText= `Wave :${this.enemyCount}`;
+        this.enemyCount++;
+        
+    }
+    
+}

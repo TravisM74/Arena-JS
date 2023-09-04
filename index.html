@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="styles/index.css">
+        <title>Arena JS</title>
+    </head>
+    <body>
+        <section class="header">
+            <h1>Arena JS</h1>
+        </section>
+        <div class="main">
+            <canvas id="canvas1" class="canvas1"></canvas>
+            <div class="status-container">
+                <h2>Stats</h2>
+                <div class="stats">
+                    <div class="level-title">Level : <span class="level-count" id="level-count"></span></div>
+                    <div id='coin-title' class="coin-title">Coins: <span id="coin-count" class="coin-count"></span></div>
+                    
+                    <div id='wave-count' class="wave-count"></div>
+                    <button class="health-potion" id="health-potion-button">
+                        <img id='health-potion-image' src="./imgs/h-potion.png" alt="health potion" width="60">
+                        <span class="health-pot-charges" id="health-pot-charges"></span>
+                    </button>
+
+                </div>
+                <button id='rest-button' class="rest">Rest</button>
+            </div>     
+
+        </div>
+    </body>
+    <div class="images">
+        <img id='skeleton1' src="./imgs/skl1_rt1.gif" alt="skeli 1">
+        <img id='skeleton2' src="./imgs/skl1_rt2.gif" alt="skeli 2">
+
+    </div>
+    <script type='module' src="app.js"></script>
+</html>

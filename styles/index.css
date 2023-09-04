@@ -1,0 +1,67 @@
+h1 {
+    text-align: center;
+}
+.canvas1 {
+    width: 80%;
+    height: 90%;
+    border: 5px double black;
+    background-color: aquamarine;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+ .main{
+    display:flex;
+
+}
+.status-container{
+    /* display:flex; */
+    /* flex-direction: column; */
+    /* justify-content: center; */
+    min-width:180px;
+    background-color: cadetblue;
+    border: 5px double black;
+    margin:  0 1rem;
+    text-align: center;
+}
+.status-container h2 {
+    display:flex;
+    justify-content: center;
+    background-color: blueviolet;
+    font-size: 3rem;
+    padding: 1rem;
+}
+button {
+    border-radius: 1rem;
+    padding: 1rem;
+    margin: 2px;
+}
+#rest-button {
+    background-color: coral;
+    font-size: 2rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    width:150px
+}
+#health-potion-button {
+    background-color: greenyellow;
+    margin:0;
+    border-radius: 1rem;
+    text-align: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+#health-potion span{
+   
+}
+.images img{
+    display: flex;
+}
+.stats div {
+    font-size: 2rem;
+}
+
+.coin-count {
+    
+    color:gold;
+}
