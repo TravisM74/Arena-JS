@@ -8,23 +8,24 @@ export class Enemy {
         this.meleeCombatRadius = 25;
         this.markedForDeletion = false;
         this.inCombat = false;
-        this.moveBase = 15;
+        this.moveBase = 20;
         this.moveVariance = 20;
         this.thac0Bonus = 0;
         this.level = 1;
         this.hitPoints = 5;
         this.maxHitPoints = 5; 
-        this.moveInterval = 2000 + Math.floor(Math.random()*4000);
+        this.moveInterval = 2000 + Math.floor(Math.random()*1000);
         this.moveTimer = 0;
         this.moveToX = 0;
         this.moveToY = 0;
         this.attacks = 1;
+        this.attackTimer = 0;
         
         this.x = Math.floor(Math.random() * this.game.WIDTH - this.width );
         this.y = Math.floor(Math.random() * this.game.HEIGHT -this.height );
         /* this.image = document.getElementById('skeleton1'); */
         this.healthBar = new HealthBar(this);
-        this.moveSpeed = Math.floor(Math.random() * this.moveVariance + this.moveBase);
+        this.moveSpeed = Math.floor(Math.random() * this.moveVariance) + this.moveBase;
     }
     draw(ctx){
         ctx.fillStyle = 'red';
@@ -39,7 +40,7 @@ export class Enemy {
             ctx.lineWidth = 3;
             ctx.stroke();
             ctx.font = 'bold 18px serif';
-            ctx.fillText(this.hitPoints+ '/'+this.maxHitPoints, this.x -this.width *0.3 , this.y +this.height * 1.2);
+            ctx.fillText(this.hitPoints+ '/'+this.maxHitPoints, this.x -this.width * 0.3 , this.y +this.height * 1.2);
         }
         
         this.healthBar.draw(ctx);
@@ -49,8 +50,8 @@ export class Enemy {
     update(deltaTime){
         
         if (this.game.soundMode) this.sound1.play();
-        this.moveToX = this.x + this.moveSpeed;
-        this.moveToY = this.y + this.moveSpeed;
+        this.moveToX = this.game.player.x;
+        this.moveToY = this.game.player.y;
   
         if ((this.x < this.game.player.x)) {
             this.x += this.moveToX / this.moveInterval;
@@ -85,6 +86,7 @@ export class Skeleton extends Enemy {
         this.coins = Math.floor(Math.random()* 15);
         this.sound1 = new Audio('../audio/mnstr9.wav');
         this.deathSound = new Audio('../audio/Falling Bones.wav');
+        this.attackInterval = 1200;
        // dificlulty scalling
        // this.level = Math.floor(this.game.wave/3) 
     }

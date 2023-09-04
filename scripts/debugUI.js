@@ -28,6 +28,6 @@ export class DebugUI {
     }
     update(time){
         this.time = time;
-        this.meleeStatus = this.game.meleeConflict.meleeFight;
+        //this.meleeStatus = this.game.meleeConflict.meleeFight;
     }
 }

@@ -6,6 +6,8 @@ export class Player {
         this.height= 32;
         this.reset();
         this.meleeCombatRadius = 25;
+        
+        this.attackTimer = 0;
         this.restInterval = 1000;
         this.restTime= 0;
         this.healthBar = new HealthBar(this);
@@ -110,6 +112,8 @@ export class Player {
         this.lives= 3;
         this.maxHitPoints = 10;
         this.armourClass = 5;
+        document.getElementById('armour-class').innerHTML = this.armourClass;
+        this.attackInterval = 1000;
         this.weaponDamage = 4;
         this.experiance = 0;
         this.victories = 0;
@@ -127,7 +131,7 @@ export class Player {
             this.healthPotions--;
             document.getElementById('health-pot-charges').innerText=`${this.healthPotions}`;
             if (this.hitPoints < this.maxHitPoints * 0.5){
-                this.hitPoints= this.maxHitPoints - Math.floor(Math.random()*4);
+                this.hitPoints = this.maxHitPoints - Math.floor(Math.random()*4);
             } else {
                 this.hitPoints += Math.floor(Math.random()*8 +1);
                 if (this.hitPoints > this.maxHitPoints) this.hitPoints = this.maxHitPoints; 

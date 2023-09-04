@@ -1,176 +1,94 @@
 import {Loot} from './Loot.js';
-export class MeleeConflict {
-    constructor(game){
-        this.game = game;
-        this.meleeFight = false
-        this.hitInterval = 2000;
-        this.hitTimer = 0;
-        
-    }
-    checkMeleeContact(a, b, deltaTime){ 
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
-        const distance = Math.hypot(dy,dx);
-        const sumOfRadii = a.meleeCombatRadius + b.meleeCombatRadius ;
-        //console.log(distance, sumOfRadii); 
-        if (distance <= sumOfRadii) {
-            //Combat
-            a.inCombat = true;
-            b.inCombat = true;
-            this.meleeFight= true;   
-            if (this.hitTimer > this.hitInterval) {
-                this.hitTimer = 0;
-                new MeleeCombat(a,b,this.game);
-            } else {
-                this.hitTimer += deltaTime;
-            }   
-        }
-        else {
-            this.meleeFight = false;
-            a.inCombat = false;
-            b.inCombat = false;
-        }
-    }
-    
-}
+import {HitUI} from './hitUI.js';
 
-class MeleeCombat {
-    constructor(a,b, game){
+export class MeleeCombat2 {
+    constructor(game){
         this.loot= new Loot();
-        this.a = a;
-        this.b = b;
         this.game = game;
-        this.roll= 0;
-        this.damageGiven = 0;
-        this.damageTaken = 0;
-        const missSound = new Audio('../audio/swosh-01.flac');
-        const missSound2 = new Audio('../audio/swosh-04.flac');
-        const hitSound1 = new Audio('../audio/5.ogg');
-        
         this.enemiesInCombat = [];
-       
-        
-        //while alive
-        if ((a.hitPoints >0) && (b.hitPoints > 0)){
-            a.inCombat = true;
-            b.inCombat = true;
-            a.state = 'Melee Combat';
-            //player Tried to hit Mob
-            this.roll=Math.floor(Math.random()*20 +1);
-            if ( this.roll >= (20 - b.armourClass)) {
-                this.damageGiven = Math.floor(Math.random() * a.weaponDamage)+1
-                b.hitPoints -= this.damageGiven;
-                //console.log(this.roll ,b);
-                if (this.game.soundMode) hitSound1.play();
-            } else {
-                //console.log(this.roll, 'miss', b);
-                if (this.game.soundMode) missSound.play();
-                this.damageGiven = 0;
-            }
-            //Mob trys to hit player
-            this.roll=Math.floor(Math.random()*20 +1);
-            if (this.roll >= (20 - a.armourClass)) {
-                this.damageTaken = Math.floor(Math.random() * b.weaponDamage)+1
-                a.hitPoints -= this.damageTaken;
-                //console.log(this.roll,a);
-                if (this.game.soundMode) hitSound1.play();
-            } else {
-                //console.log(this.roll, 'miss', a)
-                this.damageTaken = 0;
-                if (this.game.soundMode) missSound2.play();
-            }
-            // display Damage 
-            this.game.hitUI.updateData(a, this.damageTaken, b ,this.damageGiven);
-            //check for Win
-            if (b.hitPoints <= 0 ){
-                a.experiance += b.experiance;
-                a.coins+= b.coins;
-                document.getElementById('coin-count').innerHTML = `${a.coins}`;
-                b.markedForDeletion = true;
-                a.victories++;
-                a.inCombat = false;
-                a.state='adventuring';
-                if (this.game.soundMode) b.deathSound.play();
-                this.loot.getPotionLoot(a);
-                console.log(b);
-                
-                
-            } 
-            if (a.hitPoints <= 0) {
-                a.state='ko';
-                a.knockOuts++;
-                a.experiance -= Math.floor(b.experiance * 0.5);
-                // runs off with some loot
-                const coinTaken = Math.floor(a.coins *.3);
-                a.coins-= coinTaken;
-                b.coins += coinTaken;
-                //lives reduced
-                a.lives--;
-                a.hitPoints = a.maxHitPoints;
-                b.x = Math.floor(Math.random() * this.game.WIDTH);
-                b.y = Math.floor(Math.random() * this.game.HEIGHT);
-                a.inCombat = false;
-                b.inCombat = false;
-                b.markedForDeletion = true;
-                if (this.game.soundMode) a.deathSound.play();
-            }            
-        } 
-    }       
+        this.missSound = new Audio('../audio/swosh-01.flac');
+        this.missSound2 = new Audio('../audio/swosh-04.flac');
+        this.hitSound1 = new Audio('../audio/5.ogg');
+    }
+    checkMeleeContact(a,b){
+        this.a = a ;
+        this.b= b;
+        this.dx = this.a.x - this.b.x;
+        this.dy = this.a.y - this.b.y;
+        this.distance = Math.hypot(this.dy,this.dx);
+        this.sumOfRadii = a.meleeCombatRadius + b.meleeCombatRadius ;
+        //console.log(distance, sumOfRadii); 
+        if((this.distance < this.sumOfRadii )&&(!this.b.inCombat)){
+            this.addCombatant(b)
+        }
+    }
+
     addCombatant(enemy){
-        enemiesInCombat.push(enemy);
+        enemy.inCombat = true;
+        this.enemiesInCombat.push(enemy);
+       //console.log(this.enemiesInCombat);
     }
     removeDead(){
         this.enemiesInCombat = this.enemiesInCombat.filter(enemy => !enemy.markedForDeletion);
     }
-    updateTurn(){
+    playerAttack(){
         for (let i = 0 ; i < this.game.player.attacks; i++){
             //player Tried to hit Mob
             this.roll=Math.floor(Math.random()*20 +1);
-            if ( this.roll >= (20 - b.armourClass)) {
-                this.damageGiven = Math.floor(Math.random() * this.game.player.weaponDamage)+1
-                this.enemiesInCombat[0].hitPoints -= this.damageGiven;
+            if ( this.roll >= (20 - this.enemiesInCombat[0].armourClass)) {
+                this.damage = Math.floor(Math.random() * this.game.player.weaponDamage)+1;
+                this.enemiesInCombat[0].hitPoints -= this.damage;
+                this.game.displayHits.push(new HitUI(this.game.player, this.enemiesInCombat[0], this.damage));
                 //console.log(this.roll ,b);
-                if (this.game.soundMode) hitSound1.play();
+                if (this.game.soundMode) this.hitSound1.play();
+                this.removeDead();
             } else {
                 //console.log(this.roll, 'miss', b);
-                if (this.game.soundMode) missSound.play();
+                if (this.game.soundMode) this.missSound.play();
                 this.damageGiven = 0;
             }
             if (this.enemiesInCombat[0].hitPoints <= 0 ){
-                this.game.player.experiance += e.experiance;
-                this.game.player.coins+= e.coins;
-                document.getElementById('coin-count').innerHTML = `${a.coins}`;
-                e.markedForDeletion = true;
+                this.game.player.experiance += this.enemiesInCombat[0].experiance;
+                this.game.player.coins+= this.enemiesInCombat[0].coins;
+                document.getElementById('coin-count').innerHTML = `${this.game.player.coins}`;
+                this.enemiesInCombat[0].markedForDeletion = true;
                 this.game.player.victories++;
-                this.game.player.coins += this.enemiesInCombat[0].coins;
-                if (this.game.soundMode) b.deathSound.play();
-                this.loot.getPotionLoot(a);
-
-
+                if (this.game.soundMode) this.enemiesInCombat[0].deathSound.play();
+                this.loot.getPotionLoot(this.game.player);
+                this.game.player.state ='adventuring';
                 if (this.enemiesInCombat.length > 0){
                     this.removeDead();
                 }
             }
         }
-        this.enemiesInCombat.forEach((e)=> {
+    }
+    enemyAttack(enemy){
+            this.e= enemy;
             //Mob trys to hit player
             this.roll=Math.floor(Math.random()*20 +1);
             if (this.roll >= (20 - this.game.player.armourClass)) {
-                this.damageTaken = Math.floor(Math.random() * e.weaponDamage)+1
+                this.damageTaken = Math.floor(Math.random() * this.e.weaponDamage)+1
                 this.game.player.hitPoints -= this.damageTaken;
+                this.game.displayHits.push(new HitUI(this.e, this.game.player, this.damageTaken));
+                if ((this.game.player.hitPoints < 0 ) &&( !this.game.player.state === 'ko')) {
+                    this.game.player.experiance -= Math.floor(this.e.experiance * 0.5);
+                    this.game.player.state='ko'
+                    this.game.player.knockOuts++;
+                } 
                 //console.log(this.roll,a);
-                if (this.game.soundMode) hitSound1.play();
+                if (this.game.soundMode) this.hitSound1.play();
             } else {
                 //console.log(this.roll, 'miss', a)
                 this.damageTaken = 0;
-                if (this.game.soundMode) missSound2.play();
+                if (this.game.soundMode) this.missSound2.play();
             }
             // display Damage 
-            this.game.hitUI.updateData(this.game.player, this.damageTaken, e ,this.damageGiven);
+            //this.game.hitUI.updateData(this.game.player, this.damageTaken, this.e ,this.damageGiven);
             this.damageGiven = 0;
             //Enemie killed
 
-        });
+        
+
     }
     playerStatusCheck(){
         //check for Win
@@ -179,29 +97,28 @@ class MeleeCombat {
             this.game.player.state='Melee Combat';
         } else {
             this.game.player.inCombat = false;
-            this.game.player.state='adventuring';
-            console.log(b);     
+           
+            //console.log(b);     
         }
         if (this.game.player.hitPoints <= 0) {
-            this.game.player.state='ko';
-            this.game.player.knockOuts++;
-            this.game.player.experiance -= Math.floor(b.experiance * 0.5);
+            
             // runs off with some loot
             const coinTaken = Math.floor(this.game.player.coins *.3);
             this.game.player.coins-= coinTaken;
+            document.getElementById('coin-count').innerHTML = `${this.game.player.coins}`;
             //lives reduced
             this.game.player.lives--;
             this.game.player.hitPoints = this.game.player.maxHitPoints;
-            this.game.player.inCombat = false;  
+            this.game.player.inCombat = false; 
+            this.game.player.state = 'adventuring'; 
             if (this.game.soundMode) this.game.player.deathSound.play();
             //all enemies in melee removed
             this.enemiesInCombat.forEach((e)=>{
                 e.markedForDeletion= true;
-            })
-        }    
-             
-            
+            });
+            this.removeDead();
+        }          
         
     }
-
 }
+
