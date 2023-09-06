@@ -18,10 +18,10 @@ export class HitUI {
         context.font = 'bold 40px serif';
        
         if (this.damage < 1)  {
-            context.fillText('Miss' , this.attacker.x , this.attacker.y + 30);
+            context.fillText('Miss' , this.attacker.x , this.attacker.y + 30 -(this.displayTimer * 0.05));
         }
         if (this.damage > 0) { 
-            context.fillText( this.damage , this.defender.x , this.defender.y + 30);   
+            context.fillText( this.damage , this.defender.x , this.defender.y + 30 -(this.displayTimer * 0.05));   
         };
        
         context.restore();

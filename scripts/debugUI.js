@@ -23,6 +23,7 @@ export class DebugUI {
         context.fillText('Player State : ' + this.game.player.state, this.startX , this.startY + 120);
         context.fillText('Player combat : ' + this.game.player.inCombat, this.startX , this.startY + 140);
         context.fillText('Sounds : ' + this.game.soundMode, this.startX , this.startY + 160);
+        context.fillText('in combat with  : ' + this.game.meleeCombat.enemiesInCombat.length, this.startX , this.startY + 180);
         context.restore();
 
     }

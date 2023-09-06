@@ -10,6 +10,10 @@ export class Player {
         this.attackTimer = 0;
         this.restInterval = 1000;
         this.restTime= 0;
+        this.mainHand = 'fist';
+        this.offHand = 'fist';
+        this.armour = 'leather';
+
         this.healthBar = new HealthBar(this);
         this.walkingSound = new Audio('../audio/footstep00.ogg')
         this.deathSound = new Audio('../audio/aargh0.ogg');
@@ -113,7 +117,7 @@ export class Player {
         this.maxHitPoints = 10;
         this.armourClass = 5;
         document.getElementById('armour-class').innerHTML = this.armourClass;
-        this.attackInterval = 1000;
+        this.attackInterval = 1500;
         this.weaponDamage = 4;
         this.experiance = 0;
         this.victories = 0;
@@ -137,5 +141,9 @@ export class Player {
                 if (this.hitPoints > this.maxHitPoints) this.hitPoints = this.maxHitPoints; 
             }
         }
+    }
+    collectHealthPotion(){
+        this.healthPotions++;
+        document.getElementById('health-pot-charges').innerText=`${this.healthPotions}`;
     }
 }
