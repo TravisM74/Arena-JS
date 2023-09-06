@@ -13,7 +13,8 @@ export class Player {
         this.mainHand = 'fist';
         this.offHand = 'fist';
         this.armour = 'leather';
-
+        this.thac0Bonus = 0;
+        
         this.healthBar = new HealthBar(this);
         this.walkingSound = new Audio('../audio/footstep00.ogg')
         this.deathSound = new Audio('../audio/aargh0.ogg');
@@ -98,6 +99,16 @@ export class Player {
         if (this.y < 0) this.y = 0;
         if (this.y > this.game.HEIGHT) this.y = this.game.HEIGHT;
 
+        //leveling 
+        if ((this.experiance >= 1500) && (this.level === 1)) this.levelUp();
+        if ((this.experiance >= 3000) && (this.level === 2)) this.levelUp();
+        if ((this.experiance >= 5000) && (this.level === 3)) this.levelUp();
+        if ((this.experiance >= 8000) && (this.level === 4)) this.levelUp();
+        if ((this.experiance >= 11000) && (this.level === 5)) this.levelUp();
+        if ((this.experiance >= 15000) && (this.level === 6)) {
+            this.levelUp();
+            this.attacks++;
+        }
         
     }
     playerResting(deltaTime){
@@ -153,5 +164,12 @@ export class Player {
     collectHealthPotion(){
         this.healthPotions++;
         document.getElementById('health-pot-charges').innerText=`${this.healthPotions}`;
+    }
+    levelUp(){
+        this.level++;
+        document.getElementById('level-count').innerText=`${this.level}`;
+        this.thac0Bonus++;
+        this.maxHitPoints += Math.floor(Math.random()*10)+1;
+        this.hitPoints = this.maxHitPoints;
     }
 }

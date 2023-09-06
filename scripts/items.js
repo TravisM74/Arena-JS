@@ -7,7 +7,7 @@ class Items {
         this.height = 62;
         this.width = 62;
         this.markedForDeletion = false;
-        this.takeSound = new Audio('../audio/take.wav');
+        
 
     }
     draw(ctx){

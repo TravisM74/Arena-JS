@@ -19,7 +19,7 @@ export class Game {
         this.gameSpeed = 1;
         this.debugMode = true; 
         // sounds off by default 
-        this.soundMode = false;
+        this.soundMode = true;
         this.enemyCount = 1
         this.enemies = [];
         this.displayHits = [];
@@ -38,6 +38,7 @@ export class Game {
         const healthPotionButton = document.getElementById('health-potion-button');
         healthPotionButton.onclick = (()=> this.player.healWithPotion());
         this.potionSpawnSound = new Audio('../audio/bubble.wav');
+        this.takeSound = new Audio('../audio/take.wav');
         
        
     }
@@ -129,13 +130,14 @@ export class Game {
         
     }
     draw(ctx){
-        this.player.draw(ctx);
-        this.enemies.forEach( (e) => {
-            e.draw(ctx)});
         //this.hitUI.draw(ctx);
         this.playerUI.draw(ctx);
-        /* this.enemyUI.draw(ctx); */
         if (this.debugMode) this.debugUI.draw(ctx);
+        this.player.draw(ctx);
+        
+        /* this.enemyUI.draw(ctx); */
+        this.enemies.forEach( (e) => {
+            e.draw(ctx)});
         // updating displayHits
         this.displayHits.forEach((d) => {
             d.draw(ctx);
