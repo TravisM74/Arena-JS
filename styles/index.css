@@ -55,7 +55,7 @@ button {
    
 }
 .images img{
-    display: flex;
+    display: none;
 }
 .stats div {
     font-size: 2rem;

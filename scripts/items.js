@@ -15,16 +15,6 @@ class Items {
         ctx.fillRect(this.x, this.y , this.width, this.height)
     }
     update(deltaTime){
-        //item detection
-        this.game.items.forEach((item) => {
-            this.playerlocation = this.game.checkDistance(this.game.player, item);
-            if (this.playerlocation[0] < (this.game.player.meleeCombatRadius + item.pickupRadius)){
-                //picked up
-                item.activate();
-                if (this.game.soundMode) this.takeSound.play();
-                item.markedForDeletion = true;
-            }
-        });
         
     }
     

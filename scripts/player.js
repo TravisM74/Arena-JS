@@ -17,6 +17,7 @@ export class Player {
         this.healthBar = new HealthBar(this);
         this.walkingSound = new Audio('../audio/footstep00.ogg')
         this.deathSound = new Audio('../audio/aargh0.ogg');
+        this.img = document.getElementById('hr1');
     }
     draw(ctx){
         
@@ -35,6 +36,7 @@ export class Player {
             ctx.lineTo(this.x + 10, this.y);
             ctx.lineTo(this.x - 10, this.y -10);
             ctx.closePath();
+            this.img = document.getElementById('hr1');
         }
         if (this.facing === 'west'  ) {
             ctx.beginPath();
@@ -42,6 +44,7 @@ export class Player {
             ctx.lineTo(this.x - 10, this.y);
             ctx.lineTo(this.x + 10, this.y +10);
             ctx.closePath();
+            this.img = document.getElementById('hl1');
         }
         if (this.facing === 'south'  ) {
             ctx.beginPath();
@@ -49,6 +52,7 @@ export class Player {
             ctx.lineTo(this.x +10, this.y - 10);
             ctx.lineTo(this.x + 0, this.y + 10);
             ctx.closePath();
+            this.img = document.getElementById('hf1');
         }
         if (this.facing === 'north'  ) {
             ctx.beginPath();
@@ -56,8 +60,12 @@ export class Player {
             ctx.lineTo(this.x -10, this.y + 10);
             ctx.lineTo(this.x + 0, this.y - 10);
             ctx.closePath();
+            this.img = document.getElementById('hb1');
         } 
         ctx.fill(); 
+        ctx.drawImage(this.img, this.x- this.width * 0.5, this.y -this.height *0.5, this.width, this.height);
+
+
         this.healthBar.draw(ctx);
     }
     update(deltaTime){

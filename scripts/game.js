@@ -64,6 +64,17 @@ export class Game {
         } else {
             this.itemTimer += deltaTime;
         }
+        //item detection
+        this.items.forEach((item) => {
+            this.playerlocation = this.checkDistance(this.player, item);
+            if (this.playerlocation[0] < (this.player.meleeCombatRadius + item.pickupRadius)){
+                //picked up
+                item.activate();
+                if (this.soundMode) this.takeSound.play();
+                item.markedForDeletion = true;
+            }
+        });
+        
         
         // updating displayHits
         this.displayHits.forEach((d) => {
