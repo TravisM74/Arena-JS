@@ -1,4 +1,6 @@
 import {HealthBar} from './healthBar.js';
+import {Dust} from './particle.js';
+import {HealUI} from './hitUI.js';
 export class Player {
     constructor(game){
         this.game = game
@@ -19,6 +21,11 @@ export class Player {
         this.walkingSound = new Audio('../audio/footstep00.ogg')
         this.deathSound = new Audio('../audio/aargh0.ogg');
         this.img = document.getElementById('hr1');
+
+        this.pTimer =0;
+        this.pInterval = 300;
+        this.move= true;
+        
     }
     draw(ctx){
         
@@ -38,6 +45,7 @@ export class Player {
             ctx.lineTo(this.x - 10, this.y -10);
             ctx.closePath();
             this.img = document.getElementById('hr1');
+            
         }
         if (this.facing === 'west'  ) {
             ctx.beginPath();
@@ -65,13 +73,28 @@ export class Player {
         } 
         ctx.fill(); 
         ctx.drawImage(this.img, this.x- this.width * 0.5, this.y -this.height *0.5, this.width, this.height);
-
-
         this.healthBar.draw(ctx);
     }
     update(deltaTime){
         
         //Movement
+        this.movement();
+        //Boundries
+        if (this.x > this.game.WIDTH) this.x = this.game.WIDTH;
+        if (this.x < 0 ) this.x = 0;
+        if (this.y < 0) this.y = 0;
+        if (this.y > this.game.HEIGHT) this.y = this.game.HEIGHT;
+
+        this.levelCheck();
+        //moving Particles
+        if (this.pTimer > this.pInterval) {
+            this.game.particles.push(new Dust(this.game, this.x , this.y+ this.height * 0.5));
+            this.pTimer= 0;
+        } else {
+            this.pTimer += deltaTime;
+        }
+    }
+    movement(){
         if ((this.game.input.keys.indexOf('ArrowDown') > -1) && (this.state==='adventuring')) {
             this.y+= this.game.gameSpeed;
             this.facing='south';
@@ -93,29 +116,13 @@ export class Player {
             this.facing='north';
             if (this.game.soundMode) this.walkingSound.play();
         }
-        //Boundries
-        if (this.x > this.game.WIDTH) this.x = this.game.WIDTH;
-        if (this.x < 0 ) this.x = 0;
-        if (this.y < 0) this.y = 0;
-        if (this.y > this.game.HEIGHT) this.y = this.game.HEIGHT;
-
-        //leveling 
-        if ((this.experiance >= 1500) && (this.level === 1)) this.levelUp();
-        if ((this.experiance >= 3000) && (this.level === 2)) this.levelUp();
-        if ((this.experiance >= 5000) && (this.level === 3)) this.levelUp();
-        if ((this.experiance >= 8000) && (this.level === 4)) this.levelUp();
-        if ((this.experiance >= 11000) && (this.level === 5)) this.levelUp();
-        if ((this.experiance >= 15000) && (this.level === 6)) {
-            this.levelUp();
-            this.attacks++;
-        }
-        
     }
     playerResting(deltaTime){
         this.state='resting';
         if (this.restTime > this.restInterval ){
             this.restTime = 0;
             if (this.hitPoints < this.maxHitPoints )this.hitPoints ++;
+            this.game.displayHits.push(new HealUI(this, 1));
             if (this.hitPoints === this.maxHitPoints) this.state='adventuring';
             this.game.enemies.forEach((e)=> {
                 e.move();
@@ -154,9 +161,14 @@ export class Player {
             this.healthPotions--;
             document.getElementById('health-pot-charges').innerText=`${this.healthPotions}`;
             if (this.hitPoints < this.maxHitPoints * 0.5){
-                this.hitPoints = this.maxHitPoints - Math.floor(Math.random()*4);
+                this.damage= Math.floor(Math.random()*4);
+                this.healAmount = this.maxHitPoints - this.hitPoints - this.damage;
+                this.hitPoints = this.maxHitPoints - this.damage;
+                this.game.displayHits.push(new HealUI(this, this.healAmount ))
             } else {
-                this.hitPoints += Math.floor(Math.random()*8 +1);
+                this.healAmount = Math.floor(Math.random()*8 +1);
+                this.hitPoints += this.healAmount;
+                this.game.displayHits.push(new HealUI(this, this.healAmount));
                 if (this.hitPoints > this.maxHitPoints) this.hitPoints = this.maxHitPoints; 
             }
         }
@@ -171,5 +183,17 @@ export class Player {
         this.thac0Bonus++;
         this.maxHitPoints += Math.floor(Math.random()*10)+1;
         this.hitPoints = this.maxHitPoints;
+    }
+    levelCheck(){
+        //leveling 
+        if ((this.experiance >= 1500) && (this.level === 1)) this.levelUp();
+        if ((this.experiance >= 3000) && (this.level === 2)) this.levelUp();
+        if ((this.experiance >= 5000) && (this.level === 3)) this.levelUp();
+        if ((this.experiance >= 8000) && (this.level === 4)) this.levelUp();
+        if ((this.experiance >= 11000) && (this.level === 5)) this.levelUp();
+        if ((this.experiance >= 15000) && (this.level === 6)) {
+            this.levelUp();
+            this.attacks++;
+        }
     }
 }

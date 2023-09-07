@@ -1,5 +1,6 @@
 import {Loot} from './Loot.js';
 import {HitUI} from './hitUI.js';
+import {Hit} from './particle.js';
 
 export class MeleeCombat2 {
     constructor(game){
@@ -41,6 +42,7 @@ export class MeleeCombat2 {
                 this.enemiesInCombat[0].hitPoints -= this.damage;
                 //display hit
                 this.game.displayHits.push(new HitUI(this.game.player, this.enemiesInCombat[0], this.damage));
+                this.game.hitParticles.push(new Hit(this.game, this.enemiesInCombat[0].x, this.enemiesInCombat[0].y ));
                 //console.log(this.roll ,b);
                 if (this.game.soundMode) this.hitSound1.play();
                 this.removeDead();
@@ -76,6 +78,7 @@ export class MeleeCombat2 {
                 this.game.player.hitPoints -= this.damageTaken;
                 //display hit
                 this.game.displayHits.push(new HitUI(this.e, this.game.player, this.damageTaken));
+                this.game.hitParticles.push(new Hit(this.game, this.game.player.x, this.game.player.y ));
                 // check is player renderd unconcious
                 if ((this.game.player.hitPoints < 1 ) &&( !this.game.player.state === 'ko')) {
                     this.game.player.experiance -= Math.floor(this.e.experiance * 0.5);

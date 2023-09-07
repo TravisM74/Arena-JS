@@ -3,10 +3,13 @@ import {InputHandler} from './input.js';
 import {DebugUI} from './debugUI.js';
 import {Enemy, Skeleton} from './Enemy.js';
 import {MeleeCombat2} from './meleeconflict.js'
-import {HitUI} from './hitUI.js';
+import {HitUI, HealUI} from './hitUI.js';
 import {PlayerUI} from './playerUI.js';
 import {EnemyUI} from './enemyUI.js';
 import {Potion}  from './items.js';
+import {Glow} from './particle.js';
+
+
 export class Game {
     constructor(Canvas_Width, Canvas_Height){
         this.HEIGHT = Canvas_Height;
@@ -17,8 +20,8 @@ export class Game {
         this.playerUI = new PlayerUI(this);
       
         this.gameSpeed = 1;
-        this.debugMode = true; 
-        // sounds off by default 
+        this.debugMode = false; 
+        // sounds On by default 
         this.soundMode = true;
         this.enemyCount = 1
         this.enemies = [];
@@ -27,8 +30,10 @@ export class Game {
         this.items = [];
         this.itemTimer = 0;
         this.itemInterval = 5000;
-        this.items.push(new Potion(this));
+        //this.items.push(new Potion(this));
         
+       this.particles = [];
+       this.hitParticles =[];
 
         this.gameOver = false;
         this.meleeCombat = new MeleeCombat2(this);
@@ -39,6 +44,7 @@ export class Game {
         healthPotionButton.onclick = (()=> this.player.healWithPotion());
         this.potionSpawnSound = new Audio('../audio/bubble.wav');
         this.takeSound = new Audio('../audio/take.wav');
+        this.evilTakeSound = new Audio('../audio/witch_cackle-1.ogg');
         
        
     }
@@ -54,28 +60,25 @@ export class Game {
         this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
         this.displayHits = this.displayHits.filter(d => !d.markedForDeletion);
         this.items = this.items.filter(d => !d.markedForDeletion);
-       
+        this.particles = this.particles.filter(p => !p.markedForDeletion);
+        this.hitParticles = this.hitParticles.filter(p => !p.markedForDeletion);
+        
         // item Spawning
         if (this.itemTimer > this.itemInterval) {
             this.itemTimer = 0;
-            if (Math.random() < .17) {
-                this.items.push(new Potion(this)) 
+            if (Math.random() < .10) {
+                this.newItem= new Potion(this);
+                //console.log(this.newItem);
+                //this.particles.push(new Glow(this, this.newItem.x , this.newItem.y));
+                //console.log(this.particles);
+                this.items.push(this.newItem) ;
                 if (this.soundMode) this.potionSpawnSound.play();
             } 
         } else {
             this.itemTimer += deltaTime;
         }
         //item detection
-        this.items.forEach((item) => {
-            this.playerlocation = this.checkDistance(this.player, item);
-            if (this.playerlocation[0] < (this.player.meleeCombatRadius + item.pickupRadius)){
-                //picked up
-                item.activate();
-                if (this.soundMode) this.takeSound.play();
-                item.markedForDeletion = true;
-            }
-        });
-        
+       this.itemInteraction();
         
         // updating displayHits
         this.displayHits.forEach((d) => {
@@ -126,12 +129,20 @@ export class Game {
         }); 
         this.meleeCombat.playerStatusCheck();
         
+        // handle Particles
+        this.particles.forEach((p)=> {p.update(deltaTime);            
+        });
+        this.hitParticles.forEach((p)=> {p.update(deltaTime);            
+        });
         
         
     }
     draw(ctx){
         //this.hitUI.draw(ctx);
         this.playerUI.draw(ctx);
+        this.particles.forEach((p) => {p.draw(ctx);
+        });
+
         if (this.debugMode) this.debugUI.draw(ctx);
         this.player.draw(ctx);
         
@@ -143,6 +154,8 @@ export class Game {
             d.draw(ctx);
         });
         this.items.forEach((item) => item.draw(ctx));
+        // handle Particles
+        this.hitParticles.forEach((p)=> {p.draw(ctx);});
 
     }
     addSkeletonEnemies(){
@@ -159,6 +172,27 @@ export class Game {
         const distance = Math.hypot(dy,dx);
         const sumOfRadii = a.meleeCombatRadius + b.meleeCombatRadius ;
         return [distance, sumOfRadii, a ,b];
+   }
+
+   itemInteraction() {
+    this.items.forEach((item) => {
+        this.playerlocation = this.checkDistance(this.player, item);
+        if (this.playerlocation[0] < (this.player.meleeCombatRadius + item.pickupRadius)){
+            //picked up
+            item.activate();
+            if (this.soundMode) this.takeSound.play();
+            item.markedForDeletion = true;
+        }
+        this.enemies.forEach((e) => {
+            this.enemylocation =  this.checkDistance(e , item);
+            if (this.enemylocation[0] < (e.meleeCombatRadius + item.pickupRadius)){
+                //picked up
+                if (this.soundMode) this.evilTakeSound.play();;
+                item.markedForDeletion = true;
+            }
+        })
+        
+    });
    }
     
 }

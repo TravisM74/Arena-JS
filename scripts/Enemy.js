@@ -1,4 +1,5 @@
 import {HealthBar} from './healthBar.js';
+import {Dust} from './particle.js';
 export class Enemy {
     constructor(game){
         this.game = game;
@@ -10,10 +11,10 @@ export class Enemy {
         this.inCombat = false;
         this.moveBase = 1;
         this.moveVariance = 10;
-        this.moveSpeed = this.moveBase +(Math.random() * this.moveVariance)
+        this.moveSpeed = this.moveBase + this.game.enemyCount +(Math.random() * this.moveVariance)
         this.thac0Bonus = 0;
         this.level = 1;
-        this.moveInterval = 2000;
+        this.moveInterval = 1000;
         this.moveTimer = 0;
         this.moveToX = 0;
         this.moveToY = 0;
@@ -26,6 +27,8 @@ export class Enemy {
         this.loc= this.game.checkDistance(this,this.game.player);
         this.volumeLevel=0;
         this.noiseDistance = 400;
+        this.pTimer = 0;
+        this.pInterval= 200;
        
         
         /* this.image = document.getElementById('skeleton1'); */
@@ -55,7 +58,14 @@ export class Enemy {
         
     }
     update(deltaTime){
-        
+        //Dust particles
+        if (this.pTimer > this.pInterval) {
+            this.game.particles.push(new Dust(this.game, this.x , this.y+ this.height * 0.5));
+            this.pTimer= 0;
+        } else {
+            this.pTimer += deltaTime;
+        }
+
         this.sound1.volume = this.soundVolume();
         if (this.game.soundMode) this.sound1.play();
         this.moveToX = this.game.player.x;
@@ -90,7 +100,7 @@ export class Skeleton extends Enemy {
         this.experiance = 200;
         this.maxHitPoints = Math.floor(Math.random()*8)+1; 
         this.armourClass = 9;
-        this.weaponDamage = 4;;
+        this.weaponDamage = 4;
         this.coins = Math.floor(Math.random()* 15);
         this.sound1 = new Audio('../audio/mnstr9.wav');
         this.deathSound = new Audio('../audio/Falling Bones.wav');

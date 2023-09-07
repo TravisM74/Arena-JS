@@ -35,3 +35,27 @@ export class HitUI {
     }
     
 }
+export class HealUI {
+    constructor(entity, damage){
+        this.damage = damage;
+        this.entity = entity;
+        this.displayInterval = 800;
+        this.displayTimer = 0;
+        this.markedForDeletion = false;
+        this.color ='green';
+        this.font ='bold 40px serif';
+        this.shadowColor = 'black';
+    }
+    draw(context){
+        context.fillStyle= this.color;
+        context.font = this.font;
+        context.shadowOffsetX = 1;
+        context.shadowOffsetY = 1;
+        context.shadowColor = this.shadowColor;
+        context.fillText( this.damage , this.entity.x , this.entity.y -(this.displayTimer * 0.05)); 
+    }
+    update(deltaTime){
+        this.displayTimer += deltaTime;
+        if (this.displayTimer > this.displayInterval) this.markedForDeletion = true;
+    }
+}

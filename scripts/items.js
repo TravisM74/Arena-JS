@@ -1,3 +1,4 @@
+
 class Items {
     constructor(game){
         this.game = game;
@@ -22,11 +23,14 @@ class Items {
 export class Potion extends Items {
     constructor(game){
         super(game);
+        this.game = game;
         this.name = 'Healing potion';
         this.quantity = 1;
         this.image = document.getElementById('health-potion-image')
         this.spawnPercent = 0.5;
         this.spawnSound = new Audio('../audio/bottle.wav');
+       
+        
        
     }
     activate(){
