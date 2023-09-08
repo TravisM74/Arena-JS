@@ -4,8 +4,8 @@ import {Hit} from './particle.js';
 
 export class MeleeCombat2 {
     constructor(game){
-        this.loot= new Loot();
         this.game = game;
+        this.loot= new Loot(this.game);
         this.enemiesInCombat = [];
         this.missSound = new Audio('../audio/swosh-01.flac');
         this.missSound2 = new Audio('../audio/swosh-04.flac');

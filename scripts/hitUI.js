@@ -59,3 +59,11 @@ export class HealUI {
         if (this.displayTimer > this.displayInterval) this.markedForDeletion = true;
     }
 }
+export class ItemGain extends HealUI{
+    constructor(entity, message){
+        super(entity, message);
+        this.damage = message;
+        this.font = 'bold 30px serif';
+        this.color = 'blue';
+    }
+}

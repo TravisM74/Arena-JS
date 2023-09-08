@@ -6,10 +6,10 @@ export class Enemy {
         
         this.width= 32;
         this.height= 32;
-        this.meleeCombatRadius = 25;
+        this.meleeCombatRadius = 20;
         this.markedForDeletion = false;
         this.inCombat = false;
-        this.moveBase = 1;
+        this.moveBase = this.game.gameSpeed;
         this.moveVariance = 10;
         this.moveSpeed = this.moveBase + this.game.enemyCount +(Math.random() * this.moveVariance)
         this.thac0Bonus = 0;

@@ -7,7 +7,7 @@ export class Player {
         this.width = 32;
         this.height= 32;
         this.reset();
-        this.meleeCombatRadius = 25;
+        this.meleeCombatRadius = 20;
         
         this.attackTimer = 0;
         this.restInterval = 1000;
@@ -95,23 +95,23 @@ export class Player {
         }
     }
     movement(){
-        if ((this.game.input.keys.indexOf('ArrowDown') > -1) && (this.state==='adventuring')) {
+        if (((this.game.input.keys.indexOf('ArrowDown') > -1) || (this.game.input.keys.indexOf('s') > -1)) && ((this.state==='adventuring') && (this.game.enemies.length > 0))) {
             this.y+= this.game.gameSpeed;
             this.facing='south';
             if (this.game.soundMode) this.walkingSound.play();
         }
-        if ((this.game.input.keys.indexOf('ArrowRight') > -1) && (this.state==='adventuring')){
+        if (((this.game.input.keys.indexOf('ArrowRight') > -1) || (this.game.input.keys.indexOf('d') > -1)) && ((this.state==='adventuring')  && (this.game.enemies.length > 0))){
             this.x+= this.game.gameSpeed;
             this.facing='east';  
             if (this.game.soundMode) this.walkingSound.play();   
         } 
         
-        if ((this.game.input.keys.indexOf('ArrowLeft') > -1) && (this.state==='adventuring')) {
+        if (((this.game.input.keys.indexOf('ArrowLeft') > -1) || (this.game.input.keys.indexOf('a') > -1)) && ((this.state==='adventuring')  && (this.game.enemies.length > 0))) {
             this.x-= this.game.gameSpeed;
             this.facing='west';
             if (this.game.soundMode) this.walkingSound.play();
         }
-        if ((this.game.input.keys.indexOf('ArrowUp') > -1)  && (this.state==='adventuring')){
+        if (((this.game.input.keys.indexOf('ArrowUp') > -1)  || (this.game.input.keys.indexOf('w') > -1)) && ((this.state==='adventuring')  && (this.game.enemies.length > 0))){
             this.y-= this.game.gameSpeed;
             this.facing='north';
             if (this.game.soundMode) this.walkingSound.play();

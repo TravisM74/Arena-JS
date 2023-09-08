@@ -2,8 +2,8 @@ import {Game} from './scripts/game.js';
 
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
-const CANVAS_WIDTH = canvas.width = 1000;
-const CANVAS_HEIGHT = canvas.height = 1000;
+const CANVAS_WIDTH = canvas.width = 800;
+const CANVAS_HEIGHT = canvas.height = 600;
 
 
 const game = new Game(CANVAS_WIDTH,CANVAS_HEIGHT);
@@ -16,6 +16,7 @@ function animate(timeStamp) {
     game.draw(ctx);
     game.update(timeStamp,deltaTime);
    
-    if (!game.gameOver) requestAnimationFrame(animate);
+    if ((!game.gameOver) ) requestAnimationFrame(animate);
+    
 }
 animate(0);

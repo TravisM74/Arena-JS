@@ -3,11 +3,12 @@ import {InputHandler} from './input.js';
 import {DebugUI} from './debugUI.js';
 import {Enemy, Skeleton} from './Enemy.js';
 import {MeleeCombat2} from './meleeconflict.js'
-import {HitUI, HealUI} from './hitUI.js';
+import {HitUI, HealUI, ItemGain} from './hitUI.js';
 import {PlayerUI} from './playerUI.js';
 import {EnemyUI} from './enemyUI.js';
 import {Potion}  from './items.js';
 import {Glow} from './particle.js';
+import {WaveWindow} from './waveWindow.js';
 
 
 export class Game {
@@ -18,6 +19,7 @@ export class Game {
         this.input = new InputHandler(this);
         this.debugUI = new DebugUI(this);
         this.playerUI = new PlayerUI(this);
+        this.waveWindow = new WaveWindow(this);
       
         this.gameSpeed = 1;
         this.debugMode = false; 
@@ -36,6 +38,7 @@ export class Game {
        this.hitParticles =[];
 
         this.gameOver = false;
+        this.gamePause = false;
         this.meleeCombat = new MeleeCombat2(this);
         
         const restButton = document.getElementById('rest-button');
@@ -55,6 +58,7 @@ export class Game {
         this.playerUI.update();
         // end game condition
         if (this.player.lives === 0) this.gameOver= true;
+        // !!! create a gameover Window
         
         // clearing arrays
         this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
@@ -66,7 +70,7 @@ export class Game {
         // item Spawning
         if (this.itemTimer > this.itemInterval) {
             this.itemTimer = 0;
-            if (Math.random() < .10) {
+            if ((Math.random() < .10)&&(this.enemies.length > 0)) {
                 this.newItem= new Potion(this);
                 //console.log(this.newItem);
                 //this.particles.push(new Glow(this, this.newItem.x , this.newItem.y));
@@ -92,13 +96,14 @@ export class Game {
         this.items.forEach((item) => item.update(deltaTime));
 
         //handling rest mode
-        if ((this.player.state === 'ko')||(this.player.state === 'resting' ) ){
+        if ((this.player.state === 'ko')||(this.player.state === 'resting' )&&(this.enemies.length > 0) ){
             this.player.playerResting(deltaTime);
         } 
-       
+  
         //Adding Enemeies
-        if(this.enemies.length < 1){
+        if((this.enemies.length < 1) &&(!this.gamePause )){
             this.addSkeletonEnemies();
+            this.gamePause = true;
             //console.log(this.checkContact(this.player,this.enemies));
         };
 
@@ -157,6 +162,10 @@ export class Game {
         // handle Particles
         this.hitParticles.forEach((p)=> {p.draw(ctx);});
 
+        if((this.enemies.length === 0)&&(this.gamePause)){
+            this.waveWindow.draw(ctx);
+        }
+
     }
     addSkeletonEnemies(){
         for(let i = 0 ; i < this.enemyCount ; i++){
@@ -180,8 +189,10 @@ export class Game {
         if (this.playerlocation[0] < (this.player.meleeCombatRadius + item.pickupRadius)){
             //picked up
             item.activate();
+            this.displayHits.push(new ItemGain(this.player, '+1 Potion'));
             if (this.soundMode) this.takeSound.play();
             item.markedForDeletion = true;
+
         }
         this.enemies.forEach((e) => {
             this.enemylocation =  this.checkDistance(e , item);

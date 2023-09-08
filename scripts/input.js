@@ -7,13 +7,21 @@ export class InputHandler{
                     e.key === 'ArrowUp' || 
                     e.key === 'ArrowRight' || 
                     e.key === 'ArrowLeft'||
-                    e.key ==='Enter' 
-                ) && this.keys.indexOf(e.key) === -1){
-                    this.keys.push(e.key);
-                } else {
-                    if (e.key === 'd') this.game.debugMode = !this.game.debugMode ;
-                    if (e.key === 's') this.game.soundMode = !this.game.soundMode ;
-                    if (e.key === 'r') this.game.player.state='resting';
+                    e.key === 'w'||
+                    e.key === 'a'||
+                    e.key === 's'||
+                    e.key === 'd'
+                    
+                    ) && this.keys.indexOf(e.key) === -1){
+                        this.keys.push(e.key);
+                    } else {
+                        if (e.key === 't') this.game.debugMode = !this.game.debugMode ;
+                        if (e.key === 'm') this.game.soundMode = !this.game.soundMode ;
+                        if (e.key === 'r') this.game.player.state='resting';
+                        if (e.key === 'p') this.game.player.healWithPotion();
+                        //if (e.key ==='Enter') this.game.gamePause = !this.game.gamePause; 
+                        if ((e.key === ' ') &&(this.game.gamePause))this.game.gamePause = !this.game.gamePause; 
+                   
                 }
         });
         window.addEventListener('keyup', e =>{
@@ -21,7 +29,11 @@ export class InputHandler{
                 e.key === 'ArrowUp' || 
                 e.key === 'ArrowRight' || 
                 e.key === 'ArrowLeft' ||
-                e.key ==='Enter' ){
+                e.key === 'w'||
+                e.key === 'a'||
+                e.key === 's'||
+                e.key === 'd'
+                ){
                 this.keys.splice(this.keys.indexOf(e.key), 1);
             }  
         });

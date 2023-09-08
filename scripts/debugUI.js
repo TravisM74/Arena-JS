@@ -3,7 +3,7 @@ export class DebugUI {
         this.game = game
         this.time = 0;
         this.meleeStatus = true;
-        this.startX = 750;
+        this.startX = 540;
         this.startY = 40;
     }
     draw(context){
