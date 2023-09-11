@@ -3,25 +3,39 @@ export class WaveWindow {
         this.game = game;
         this.game = game
         this.time = 0;
-        this.startX = 20;
-        this.startY = 40;
+        this.startX = 260;
+        this.startY = 200;
         this.display = true;
+        this.colorTimer = 0;
+        this.colorInterval = 1;
+        this.blueColor = 150;
+        this.color = `rgb(0,0,${this.blueColor})`;
     }
     draw(ctx){
         if (this.display) ctx.clearRect(0,0,this.game.WIDTH,this.game.HEIGHT);
         ctx.save();
-        ctx.fillStyle= 'green';
+        
         ctx.shadowOffsetX = 1;
         ctx.shadowOffsetY = 1;
         ctx.shadowColor = 'black';
         ctx.font = 'bold 30px serif';
-       
-        if (this.display) ctx.fillText('Wave ' + (this.game.enemyCount-1) + ' Complete', this.startX , this.startY );
+        ctx.fillStyle = 'green';
+        if ((this.display)&&(!this.game.player.defeatedInCombat)) ctx.fillText('Wave ' + (this.game.enemyCount-1) + ' Complete', this.startX , this.startY );
         if (this.display) ctx.fillText(this.game.player.lives +' Lives Remaning', this.startX , this.startY + 30);
-        if (this.display) ctx.fillText('"space" to continue' , this.startX , this.startY + 60);
+        ctx.fillStyle= this.color;
+        if (this.display) ctx.fillText('"space"' , this.startX +40 , this.startY + 60);
+        ctx.fillStyle = 'green';
+        if (this.display) ctx.fillText(' to continue ...' , this.startX , this.startY + 90);
         
     }
-    update(){
-        
+    update(deltaTime){
+        if (this.colorTimer > this.colorInterval){
+            this.colorTimer = 0;
+            this.blueColor++;
+            if (this.blueColor > 255) this.blueColor-= 100;
+            this.color = `rgb(0,0,${this.blueColor})`;
+        } else {
+            this.colorTimer+= deltaTime;
+        }
     }
 }

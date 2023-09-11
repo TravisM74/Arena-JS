@@ -9,9 +9,10 @@ export class Enemy {
         this.meleeCombatRadius = 20;
         this.markedForDeletion = false;
         this.inCombat = false;
-        this.moveBase = this.game.gameSpeed;
-        this.moveVariance = 10;
-        this.moveSpeed = this.moveBase + this.game.enemyCount +(Math.random() * this.moveVariance)
+        this.moveBase = this.game.gameSpeed * 0.02 ;
+        this.moveSpeed = this.moveBase + (this.game.enemyCount *.05 ) + (this.moveVariance);
+       
+        this.moveVariance = Math.random() *  .6;
         this.thac0Bonus = 0;
         this.level = 1;
         this.moveInterval = 1000;
@@ -29,11 +30,9 @@ export class Enemy {
         this.noiseDistance = 400;
         this.pTimer = 0;
         this.pInterval= 200;
-       
-        
-        /* this.image = document.getElementById('skeleton1'); */
+     
         this.healthBar = new HealthBar(this);
-        this.moveSpeed = Math.floor(Math.random() * this.moveVariance) + this.moveBase;
+       
     }
     draw(ctx){
         ctx.fillStyle = 'red';
@@ -72,25 +71,18 @@ export class Enemy {
         this.moveToY = this.game.player.y;
 
         if ((this.x < this.game.player.x)) {
-            this.x += this.moveToX / (this.moveSpeed * this.moveInterval);
+            this.x += this.moveToX / (this.moveInterval / this.moveSpeed);
         } else {
-            this.x -= this.moveToX / (this.moveSpeed * this.moveInterval);
+            this.x -= this.moveToX / (this.moveInterval / this.moveSpeed);
         }
         if ((this.y < this.game.player.y)) {
-            this.y += this.moveToY / (this.moveSpeed * this.moveInterval);
+            this.y += this.moveToY / (this.moveInterval / this.moveSpeed);
         } else {
-            this.y -= this.moveToY / (this.moveSpeed * this.moveInterval);
+            this.y -= this.moveToY / (this.moveInterval / this.moveSpeed);
         }
   
     }
-    move(){
-        /*       this.sound1.play()
-        if (this.x > this.game.player.x) this.x -= Math.floor(Math.random() * this.moveDistance + 5);
-        if (this.x < this.game.player.x) this.x += Math.floor(Math.random() * this.moveDistance + 5);
-        if (this.y < this.game.player.y) this.y += Math.floor(Math.random() * this.moveDistance + 5);
-        if (this.y > this.game.player.y) this.y -= Math.floor(Math.random() * this.moveDistance + 5);
-        */
-    }
+    /* this.moveToY / (this.moveSpeed * this.moveInterval); */
 }
 export class Skeleton extends Enemy {
     constructor(game){
@@ -106,8 +98,10 @@ export class Skeleton extends Enemy {
         this.deathSound = new Audio('../audio/Falling Bones.wav');
         this.attackInterval = 1800;
         this.hitPoints = this.maxHitPoints;
-        // dificlulty scalling
-        // this.level = Math.floor(this.game.wave/3) 
+        this.moveBase = this.game.gameSpeed * 0.02 ;
+        this.moveSpeed = this.moveBase + (this.game.enemyCount *.05 ) + (this.moveVariance);
+        //console.log(this.moveBase, this.moveVariance,this.moveSpeed);
+        this.moveVariance = Math.random() *  .6;
     }
     draw(ctx){
         super.draw(ctx);

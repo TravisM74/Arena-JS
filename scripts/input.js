@@ -24,7 +24,10 @@ export class InputHandler{
                         }
                         if (e.key === 'p') this.game.player.healWithPotion();
                         //if (e.key ==='Enter') this.game.gamePause = !this.game.gamePause; 
-                        if ((e.key === ' ') &&(this.game.gamePause))this.game.gamePause = !this.game.gamePause; 
+                        if ((e.key === ' ') && (this.game.gamePause)) {
+                            this.game.gamePause = !this.game.gamePause;
+                            if(this.game.player.defeatedInCombat) this.game.player.defeatedInCombat = !this.game.player.defeatedInCombat;
+                        }
                    
                 }
         });

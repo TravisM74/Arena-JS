@@ -2,7 +2,7 @@ import {Glow} from './particle.js';
 class Items {
     constructor(game){
         this.game = game;
-        this.pickupRadius = 5;
+        this.pickupRadius = 10;
         this.x = (Math.random()* this.game.WIDTH);
         this.y = Math.random()* this.game.HEIGHT;
         this.height = 62;

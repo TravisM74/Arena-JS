@@ -65,37 +65,41 @@ export class Player {
     drawFacing(ctx){
         ctx.fillStyle ='black';
         if (this.facing === 'east' ) {
-            ctx.beginPath();
-            ctx.moveTo(this.x - 10, this.y +10);
-            ctx.lineTo(this.x + 10, this.y);
-            ctx.lineTo(this.x - 10, this.y -10);
-            ctx.closePath();
-            this.img = document.getElementById('hr1');
+            if (this.game.debugMode){
+                ctx.beginPath();
+                ctx.moveTo(this.x - 10, this.y +10);
+                ctx.lineTo(this.x + 10, this.y);
+                ctx.lineTo(this.x - 10, this.y -10);
+                ctx.closePath();
+            } else this.img = document.getElementById('hr1');
             
         }
         if (this.facing === 'west'  ) {
-            ctx.beginPath();
-            ctx.moveTo(this.x + 10, this.y -10);
-            ctx.lineTo(this.x - 10, this.y);
-            ctx.lineTo(this.x + 10, this.y +10);
-            ctx.closePath();
-            this.img = document.getElementById('hl1');
+            if (this.game.debugMode){
+                ctx.beginPath();
+                ctx.moveTo(this.x + 10, this.y -10);
+                ctx.lineTo(this.x - 10, this.y);
+                ctx.lineTo(this.x + 10, this.y +10);
+                ctx.closePath();
+            } else this.img = document.getElementById('hl1');
         }
         if (this.facing === 'south'  ) {
-            ctx.beginPath();
-            ctx.moveTo(this.x - 10, this.y -10);
-            ctx.lineTo(this.x +10, this.y - 10);
-            ctx.lineTo(this.x + 0, this.y + 10);
-            ctx.closePath();
-            this.img = document.getElementById('hf1');
+            if (this.game.debugMode){
+                ctx.beginPath();
+                ctx.moveTo(this.x - 10, this.y -10);
+                ctx.lineTo(this.x +10, this.y - 10);
+                ctx.lineTo(this.x + 0, this.y + 10);
+                ctx.closePath();
+            } else this.img = document.getElementById('hf1');
         }
         if (this.facing === 'north'  ) {
-            ctx.beginPath();
-            ctx.moveTo(this.x + 10, this.y +10);
-            ctx.lineTo(this.x -10, this.y + 10);
-            ctx.lineTo(this.x + 0, this.y - 10);
-            ctx.closePath();
-            this.img = document.getElementById('hb1');
+            if (this.game.debugMode){
+                ctx.beginPath();
+                ctx.moveTo(this.x + 10, this.y +10);
+                ctx.lineTo(this.x -10, this.y + 10);
+                ctx.lineTo(this.x + 0, this.y - 10);
+                ctx.closePath();
+            } else this.img = document.getElementById('hb1');
         } 
         ctx.fill(); 
     }
@@ -127,12 +131,12 @@ export class Player {
         this.state='resting';
         if (this.restTime > this.restInterval ){
             this.restTime = 0;
-            if (this.hitPoints < this.maxHitPoints )this.hitPoints ++;
-            this.game.displayHits.push(new HealUI(this, 1));
+            if (this.hitPoints < this.maxHitPoints ){
+                this.hitPoints ++;
+                this.game.displayHits.push(new HealUI(this, 1));
+            }
             if (this.hitPoints === this.maxHitPoints) this.state='adventuring';
-            this.game.enemies.forEach((e)=> {
-                e.move();
-            })
+           
         } else {
             this.restTime += deltaTime;
         }
@@ -145,12 +149,13 @@ export class Player {
         this.y = this.game.HEIGHT /2;
         this.hitPoints = 10;
         this.thac0Bonus = 0;
-        this.lives= 1;
+        this.lives= 3;
         this.maxHitPoints = 10;
         this.armourClass = 5;
         document.getElementById('armour-class').innerHTML = this.armourClass;
         this.attackInterval = 1500;
         this.weaponDamage = 4;
+        this.bonusDamage = 0;
         this.experiance = 0;
         this.victories = 0;
         this.knockOuts = 0;
@@ -160,6 +165,7 @@ export class Player {
         this.coins = 0;
         this.healthPotions = 0;
         document.getElementById('health-pot-charges').innerText=`${this.healthPotions}`;
+        this.defeatedInCombat = false;
     }
     healWithPotion() {
         console.log('button activated script')

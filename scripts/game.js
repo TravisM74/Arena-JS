@@ -7,6 +7,7 @@ import {HitUI, HealUI, ItemGain} from './hitUI.js';
 import {PlayerUI} from './playerUI.js';
 import {EnemyUI} from './enemyUI.js';
 import {Potion}  from './items.js';
+import {Loot} from './Loot.js';
 
 import {WaveWindow} from './waveWindow.js';
 import {GameOverWindow} from './gameOverWindow.js'
@@ -21,6 +22,7 @@ export class Game {
         this.playerUI = new PlayerUI(this);
         this.waveWindow = new WaveWindow(this);
         this.gameOverWindow = new GameOverWindow(this);
+        this.loot= new Loot(this);
       
         this.gameSpeed = 1;
         this.debugMode = false; 
@@ -31,10 +33,7 @@ export class Game {
         this.meleeCombat = new MeleeCombat2(this);
         
         this.buttonConfig();
-        this.audioConfig();
-        
-       
-       
+        this.audioConfig();  
     }
    
     update(timeStamp,deltaTime){   
@@ -48,8 +47,10 @@ export class Game {
         } 
         
         this.clearMarkedForDelete();
+        //items
         this.itemSpawning(deltaTime);
         this.itemInteractionCheck();
+        this.items.forEach((item) => item.update(deltaTime));
         
         // updating displayHits
         this.displayHits.forEach((d) => {
@@ -60,23 +61,21 @@ export class Game {
         this.enemies.forEach((e)=> {
             if (!e.inCombat) e.update(deltaTime); 
         });
-        this.items.forEach((item) => item.update(deltaTime));
         
-        //handling rest mode
         this.handlingPlayerRestingState(deltaTime);
         
         this.addingEnemiesCheck();
 
-        //meleeCombatCheck
         this.meleeCombatCheck(deltaTime);
-        
         
         // handle Particles
         this.particles.forEach((p)=> {p.update(deltaTime);            
         });
         this.hitParticles.forEach((p)=> {p.update(deltaTime);            
         });
-        
+        //handle Windows updates
+        this.waveWindow.update(deltaTime);
+        this.gameOverWindow.update(deltaTime);
         
     }
     draw(ctx){
