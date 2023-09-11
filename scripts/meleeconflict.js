@@ -62,6 +62,7 @@ export class MeleeCombat2 {
                 this.game.player.victories++;
                 if (this.game.soundMode) this.enemiesInCombat[0].deathSound.play();
                 this.loot.getPotionLoot(this.game.player);
+                this.loot.checkArmourUpgradeLoot(this.game.player);
                 this.game.player.state ='adventuring';
                 if (this.enemiesInCombat.length > 0){
                     this.removeDead();

@@ -67,3 +67,11 @@ export class ItemGain extends HealUI{
         this.color = 'blue';
     }
 }
+export class LevelUP extends HealUI{
+    constructor(entity, message){
+        super(entity, message);
+        this.damage = message;
+        this.font = 'bold 40px serif';
+        this.color = 'gold';
+    }
+}

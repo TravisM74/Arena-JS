@@ -1,4 +1,4 @@
-
+import {Glow} from './particle.js';
 class Items {
     constructor(game){
         this.game = game;

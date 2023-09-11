@@ -19,6 +19,7 @@ h1 {
     /* flex-direction: column; */
     /* justify-content: center; */
     min-width:180px;
+    max-Width: 250px;
     background-color: cadetblue;
     border: 5px double black;
     margin:  0 1rem;
@@ -67,4 +68,7 @@ button {
 }
 .key-guide {
     background-color: aquamarine;
+}
+.rules {
+    max-Width: 250px
 }

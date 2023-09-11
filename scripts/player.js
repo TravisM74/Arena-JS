@@ -1,6 +1,6 @@
 import {HealthBar} from './healthBar.js';
 import {Dust} from './particle.js';
-import {HealUI} from './hitUI.js';
+import {HealUI, LevelUP} from './hitUI.js';
 export class Player {
     constructor(game){
         this.game = game
@@ -37,6 +37,32 @@ export class Player {
             ctx.lineWidth = 3;
             ctx.stroke();
         }
+        this.drawFacing(ctx);
+        
+        if (!this.game.debugMode) ctx.drawImage(this.img, this.x- this.width * 0.5, this.y -this.height *0.5, this.width, this.height);
+        this.healthBar.draw(ctx);
+    }
+    update(deltaTime){
+        
+        //Movement
+        this.movement();
+        //Boundries
+        if (this.x > this.game.WIDTH) this.x = this.game.WIDTH;
+        if (this.x < 0 ) this.x = 0;
+        if (this.y < 0) this.y = 0;
+        if (this.y > this.game.HEIGHT) this.y = this.game.HEIGHT;
+
+        this.levelCheck();
+        //moving Particles
+        if (this.pTimer > this.pInterval) {
+            this.game.particles.push(new Dust(this.game, this.x , this.y+ this.height * 0.5));
+            this.pTimer= 0;
+        } else {
+            this.pTimer += deltaTime;
+        }
+    }
+
+    drawFacing(ctx){
         ctx.fillStyle ='black';
         if (this.facing === 'east' ) {
             ctx.beginPath();
@@ -72,28 +98,8 @@ export class Player {
             this.img = document.getElementById('hb1');
         } 
         ctx.fill(); 
-        ctx.drawImage(this.img, this.x- this.width * 0.5, this.y -this.height *0.5, this.width, this.height);
-        this.healthBar.draw(ctx);
     }
-    update(deltaTime){
-        
-        //Movement
-        this.movement();
-        //Boundries
-        if (this.x > this.game.WIDTH) this.x = this.game.WIDTH;
-        if (this.x < 0 ) this.x = 0;
-        if (this.y < 0) this.y = 0;
-        if (this.y > this.game.HEIGHT) this.y = this.game.HEIGHT;
 
-        this.levelCheck();
-        //moving Particles
-        if (this.pTimer > this.pInterval) {
-            this.game.particles.push(new Dust(this.game, this.x , this.y+ this.height * 0.5));
-            this.pTimer= 0;
-        } else {
-            this.pTimer += deltaTime;
-        }
-    }
     movement(){
         if (((this.game.input.keys.indexOf('ArrowDown') > -1) || (this.game.input.keys.indexOf('s') > -1)) && ((this.state==='adventuring') && (this.game.enemies.length > 0))) {
             this.y+= this.game.gameSpeed;
@@ -139,7 +145,7 @@ export class Player {
         this.y = this.game.HEIGHT /2;
         this.hitPoints = 10;
         this.thac0Bonus = 0;
-        this.lives= 3;
+        this.lives= 1;
         this.maxHitPoints = 10;
         this.armourClass = 5;
         document.getElementById('armour-class').innerHTML = this.armourClass;
@@ -183,6 +189,7 @@ export class Player {
         this.thac0Bonus++;
         this.maxHitPoints += Math.floor(Math.random()*10)+1;
         this.hitPoints = this.maxHitPoints;
+        this.game.displayHits.push(new LevelUP(this.game.player, 'Level UP')); 
     }
     levelCheck(){
         //leveling 
