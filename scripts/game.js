@@ -131,8 +131,8 @@ export class Game {
     }
     audioConfig(){
         this.potionSpawnSound = new Audio('../audio/bubble.wav');
-        this.takeSound = new Audio('../audio/take.wav');
-        this.evilTakeSound = new Audio('../audio/witch_cackle-1.ogg');
+       
+       
     }
     handlingPlayerRestingState(deltaTime){
         if ((this.player.state === 'ko')||(this.player.state === 'resting' )&&(this.enemies.length > 0) ){
@@ -183,7 +183,30 @@ export class Game {
         }); 
         this.meleeCombat.playerStatusCheck();
     }
-
+    
+    clearMarkedForDelete(){
+        this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
+        this.displayHits = this.displayHits.filter(d => !d.markedForDeletion);
+        this.items = this.items.filter(d => !d.markedForDeletion);
+        this.particles = this.particles.filter(p => !p.markedForDeletion);
+        this.hitParticles = this.hitParticles.filter(p => !p.markedForDeletion);
+    }
+    checkDistance(a,b){
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distance = Math.hypot(dy,dx);
+        const sumOfRadii = a.meleeCombatRadius + b.meleeCombatRadius ;
+        return [(distance < sumOfRadii)];
+    }
+   checkcollision(a,b){
+       const dx = a.x - b.x;
+       const dy = a.y - b.y;
+       const distance = Math.hypot(dy,dx);
+       const sumOfRadii = a.meleeCombatRadius + b.meleeCombatRadius ;
+       return [(distance < sumOfRadii),distance, sumOfRadii, dx ,dy];
+    }
+    
+    
     itemSpawning(deltaTime){
         if (this.itemTimer > this.itemInterval) {
             this.itemTimer = 0;
@@ -197,42 +220,9 @@ export class Game {
             this.itemTimer += deltaTime;
         }
     }
-
-    clearMarkedForDelete(){
-        this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
-        this.displayHits = this.displayHits.filter(d => !d.markedForDeletion);
-        this.items = this.items.filter(d => !d.markedForDeletion);
-        this.particles = this.particles.filter(p => !p.markedForDeletion);
-        this.hitParticles = this.hitParticles.filter(p => !p.markedForDeletion);
-    }
-    checkDistance(a,b){
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
-        const distance = Math.hypot(dy,dx);
-        const sumOfRadii = a.meleeCombatRadius + b.meleeCombatRadius ;
-        return [distance, sumOfRadii, a ,b];
-   }
-
    itemInteractionCheck() {
-    this.items.forEach((item) => {
-        this.playerlocation = this.checkDistance(this.player, item);
-        if (this.playerlocation[0] < (this.player.meleeCombatRadius + item.pickupRadius)){
-            //picked up
-            item.activate();
-            this.displayHits.push(new ItemGain(this.player, '+1 Potion'));
-            if (this.soundMode) this.takeSound.play();
-            item.markedForDeletion = true;
-        }
-        this.enemies.forEach((e) => {
-            this.enemylocation =  this.checkDistance(e , item);
-            if (this.enemylocation[0] < (e.meleeCombatRadius + item.pickupRadius)){
-                //picked up
-                if (this.soundMode) this.evilTakeSound.play();;
-                item.markedForDeletion = true;
-            }
-        })
-        
-    });
+    
+    
     
    }
     

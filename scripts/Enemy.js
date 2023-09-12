@@ -80,9 +80,35 @@ export class Enemy {
         } else {
             this.y -= this.moveToY / (this.moveInterval / this.moveSpeed);
         }
+        this.game.items.forEach((item) => {
+            let [collision,distance, sumOfRadii, dx ,dy] = this.game.checkcollision(this, item);
+            if (collision){
+                //picked up
+                if (this.game.soundMode) this.evilTakeSound.play();;
+                item.markedForDeletion = true;
+            }
+        })
+        
+    
+
+        // Enemy collision 
+       /*  [(distance < sumOfRadii),distance, sumOfRadii, dx ,dy] */
+        this.game.enemies.forEach((e) => {
+            let [collision,distance, sumOfRadii, dx ,dy] = this.game.checkcollision(this, e);
+            if (collision){
+                //console.log('collision');
+                if (e !== this){
+                    const unit_X = dx / distance;
+                    const unit_Y = dy / distance;
+                    this.x = e.x + (sumOfRadii + 1) * unit_X;
+                    this.y = e.y + (sumOfRadii + 1) * unit_Y;
+                }
+            };
+
+        })
   
     }
-    /* this.moveToY / (this.moveSpeed * this.moveInterval); */
+    
 }
 export class Skeleton extends Enemy {
     constructor(game){
@@ -90,6 +116,7 @@ export class Skeleton extends Enemy {
         this.image = document.getElementById('skeleton1');
         this.name ='skeleton';
         this.experiance = 200;
+        this.meleeCombatRadius = 20;
         this.maxHitPoints = Math.floor(Math.random()*8)+1; 
         this.armourClass = 9;
         this.weaponDamage = 4;
@@ -102,6 +129,7 @@ export class Skeleton extends Enemy {
         this.moveSpeed = this.moveBase + (this.game.enemyCount *.05 ) + (this.moveVariance);
         //console.log(this.moveBase, this.moveVariance,this.moveSpeed);
         this.moveVariance = Math.random() *  .6;
+        this.evilTakeSound = new Audio('../audio/witch_cackle-1.ogg');
     }
     draw(ctx){
         super.draw(ctx);

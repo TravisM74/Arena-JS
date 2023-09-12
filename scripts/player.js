@@ -1,6 +1,6 @@
 import {HealthBar} from './healthBar.js';
 import {Dust} from './particle.js';
-import {HealUI, LevelUP} from './hitUI.js';
+import {HealUI, LevelUP, ItemGain} from './hitUI.js';
 export class Player {
     constructor(game){
         this.game = game
@@ -20,12 +20,12 @@ export class Player {
         this.healthBar = new HealthBar(this);
         this.walkingSound = new Audio('../audio/footstep00.ogg')
         this.deathSound = new Audio('../audio/aargh0.ogg');
+        this.takeSound = new Audio('../audio/take.wav');
         this.img = document.getElementById('hr1');
 
         this.pTimer =0;
         this.pInterval = 300;
         this.move= true;
-        
     }
     draw(ctx){
         
@@ -60,6 +60,17 @@ export class Player {
         } else {
             this.pTimer += deltaTime;
         }
+        //collision with item
+        this.game.items.forEach((item) => {
+            let [collision,distance, sumOfRadii, dx ,dy] = this.game.checkcollision(this, item);
+            if (collision){
+                //picked up
+                item.activate();
+                this.game.displayHits.push(new ItemGain(this, '+1 Potion'));
+                if (this.game.soundMode) this.takeSound.play();
+                item.markedForDeletion = true;
+            }
+        });
     }
 
     drawFacing(ctx){

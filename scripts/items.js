@@ -3,8 +3,8 @@ class Items {
     constructor(game){
         this.game = game;
         this.pickupRadius = 10;
-        this.x = (Math.random()* this.game.WIDTH);
-        this.y = Math.random()* this.game.HEIGHT;
+        this.x = Math.random()* this.game.WIDTH ;
+        this.y = Math.random()* this.game.HEIGHT ;
         this.height = 62;
         this.width = 62;
         this.markedForDeletion = false;
@@ -29,9 +29,8 @@ export class Potion extends Items {
         this.image = document.getElementById('health-potion-image')
         this.spawnPercent = 0.5;
         this.spawnSound = new Audio('../audio/bottle.wav');
-       
-        
-       
+        this.meleeCombatRadius = 20;
+ 
     }
     activate(){
         this.game.player.collectHealthPotion();
