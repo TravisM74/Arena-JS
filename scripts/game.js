@@ -27,6 +27,9 @@ export class Game {
         this.gameSpeed = 1;
         this.debugMode = false; 
         this.soundMode = true;
+
+        this.waveWindowTimer = 0;
+        this.waveWindowInterval = 4000;
        
         this.reset();
         
@@ -44,12 +47,12 @@ export class Game {
         if (this.player.lives === 0){
             this.gameOver= true;
             this.gamePause= true;  
+            this.loseSound.play();
         } 
         
         this.clearMarkedForDelete();
         //items
-        this.itemSpawning(deltaTime);
-        this.itemInteractionCheck();
+        this.itemSpawning(deltaTime); 
         this.items.forEach((item) => item.update(deltaTime));
         
         // updating displayHits
@@ -63,11 +66,8 @@ export class Game {
         });
         
         this.handlingPlayerRestingState(deltaTime);
-        
         this.addingEnemiesCheck();
-
-        this.meleeCombatCheck(deltaTime);
-        
+        this.meleeCombatCheck(deltaTime); 
         // handle Particles
         this.particles.forEach((p)=> {p.update(deltaTime);            
         });
@@ -76,6 +76,9 @@ export class Game {
         //handle Windows updates
         this.waveWindow.update(deltaTime);
         this.gameOverWindow.update(deltaTime);
+        if((this.enemies.length === 0)&&(this.gamePause) && (!this.gameOver)){
+        this.waveWindowTimer += deltaTime;
+        }
         
     }
     draw(ctx){
@@ -102,7 +105,8 @@ export class Game {
         if (this.player.lives === 0){
             this.gameOverWindow.draw(ctx);
         }  
-        if((this.enemies.length === 0)&&(this.gamePause) && (!this.gameOver)){
+        if((this.enemies.length === 0)&&(this.gamePause) && (!this.gameOver) && (this.waveWindowTimer > this.waveWindowInterval)){
+            
             this.waveWindow.draw(ctx);
         }
 
@@ -131,7 +135,8 @@ export class Game {
     }
     audioConfig(){
         this.potionSpawnSound = new Audio('../audio/bubble.wav');
-       
+        this.takeSound = new Audio('../audio/take.wav');
+        this.loseSound = new Audio('../audio/lose.wav');
        
     }
     handlingPlayerRestingState(deltaTime){
@@ -149,7 +154,7 @@ export class Game {
     }
     addNewEnemies(){
         for(let i = 0 ; i < this.enemyCount ; i++){
-            this.enemies.push(new Skeleton(this));   
+            this.enemies.push(new Skeleton(this, 1));   
         }
         document.getElementById('wave-count').innerText= `Wave :${this.enemyCount}`;
         this.enemyCount++;
@@ -220,10 +225,6 @@ export class Game {
             this.itemTimer += deltaTime;
         }
     }
-   itemInteractionCheck() {
-    
-    
-    
-   }
+  
     
 }

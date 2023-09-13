@@ -27,6 +27,7 @@ export class InputHandler{
                         if ((e.key === ' ') && (this.game.gamePause)) {
                             this.game.gamePause = !this.game.gamePause;
                             if(this.game.player.defeatedInCombat) this.game.player.defeatedInCombat = !this.game.player.defeatedInCombat;
+                            this.game.waveWindowTimer = 0;
                         }
                    
                 }

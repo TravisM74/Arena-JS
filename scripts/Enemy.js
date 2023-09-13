@@ -1,7 +1,7 @@
 import {HealthBar} from './healthBar.js';
 import {Dust} from './particle.js';
 export class Enemy {
-    constructor(game){
+    constructor(game, level){
         this.game = game;
         
         this.width= 32;
@@ -13,12 +13,11 @@ export class Enemy {
         this.moveSpeed = this.moveBase + (this.game.enemyCount *.05 ) + (this.moveVariance);
        
         this.moveVariance = Math.random() *  .6;
-        this.thac0Bonus = 0;
-        this.level = 1;
+        this.level = level;
+        this.thac0Bonus = this.level -1;
         this.moveInterval = 1000;
         this.moveTimer = 0;
-        this.moveToX = 0;
-        this.moveToY = 0;
+        
         this.attacks = 1;
         this.attackTimer = 0;
         this.xloc = Math.random() * 100;
@@ -57,14 +56,8 @@ export class Enemy {
         
     }
     update(deltaTime){
-        //Dust particles
-        if (this.pTimer > this.pInterval) {
-            this.game.particles.push(new Dust(this.game, this.x , this.y+ this.height * 0.5));
-            this.pTimer= 0;
-        } else {
-            this.pTimer += deltaTime;
-        }
-
+        this.createDustParticles(deltaTime);
+        
         this.sound1.volume = this.soundVolume();
         if (this.game.soundMode) this.sound1.play();
         this.moveToX = this.game.player.x;
@@ -80,6 +73,12 @@ export class Enemy {
         } else {
             this.y -= this.moveToY / (this.moveInterval / this.moveSpeed);
         }
+        this.itemInteraction();
+        this.checkEnemyCollision();
+        
+    }
+
+    itemInteraction(){
         this.game.items.forEach((item) => {
             let [collision,distance, sumOfRadii, dx ,dy] = this.game.checkcollision(this, item);
             if (collision){
@@ -89,10 +88,20 @@ export class Enemy {
             }
         })
         
+    }
+    createDustParticles(deltaTime){
+        //Dust particles
+        if (this.pTimer > this.pInterval) {
+            this.game.particles.push(new Dust(this.game, this.x , this.y+ this.height * 0.5));
+            this.pTimer= 0;
+        } else {
+            this.pTimer += deltaTime;
+        }
+        
+    }
     
-
+    checkEnemyCollision(){
         // Enemy collision 
-       /*  [(distance < sumOfRadii),distance, sumOfRadii, dx ,dy] */
         this.game.enemies.forEach((e) => {
             let [collision,distance, sumOfRadii, dx ,dy] = this.game.checkcollision(this, e);
             if (collision){
@@ -102,34 +111,51 @@ export class Enemy {
                     const unit_Y = dy / distance;
                     this.x = e.x + (sumOfRadii + 1) * unit_X;
                     this.y = e.y + (sumOfRadii + 1) * unit_Y;
-                }
+                    
+                    //trying to fix the que  behind issue 
+                    //console.log('x:'+ this.x,e.x,'y:'+ this.y, e.y);
+                    if (this.x < e.x ) this.y++;
+                    if (this.x > e.x ) this.y--;
+                    this.y > e.y ? this.x++ : this.x--;
+                }   
+                
+                
             };
-
+            
         })
-  
     }
     
+    calculateHitPoints(){
+        let tempHP = 0;
+        for (let i = 0; i < this.level; i++ ){
+            tempHP += Math.floor(Math.random()*8)+1; 
+        } 
+        return tempHP;    
+    }
 }
 export class Skeleton extends Enemy {
-    constructor(game){
-        super(game);
+    constructor(game, level){
+        super(game, level);
         this.image = document.getElementById('skeleton1');
         this.name ='skeleton';
-        this.experiance = 200;
+        this.experiance = 200 * this.level;
         this.meleeCombatRadius = 20;
-        this.maxHitPoints = Math.floor(Math.random()*8)+1; 
+        
+        this.maxHitPoints = this.calculateHitPoints();
+        this.hitPoints = this.maxHitPoints;
+    
         this.armourClass = 9;
         this.weaponDamage = 4;
         this.coins = Math.floor(Math.random()* 15);
         this.sound1 = new Audio('../audio/mnstr9.wav');
         this.deathSound = new Audio('../audio/Falling Bones.wav');
         this.attackInterval = 1800;
-        this.hitPoints = this.maxHitPoints;
         this.moveBase = this.game.gameSpeed * 0.02 ;
         this.moveSpeed = this.moveBase + (this.game.enemyCount *.05 ) + (this.moveVariance);
         //console.log(this.moveBase, this.moveVariance,this.moveSpeed);
         this.moveVariance = Math.random() *  .6;
         this.evilTakeSound = new Audio('../audio/witch_cackle-1.ogg');
+        
     }
     draw(ctx){
         super.draw(ctx);
@@ -137,9 +163,9 @@ export class Skeleton extends Enemy {
         
     }
     soundVolume(){
-        this.currentLoc = this.game.checkDistance(this, this.game.player);
-        if (this.currentLoc[0] < this.noiseDistance) {
-            this.volumeLevel = 1-(this.currentLoc[0] / this.noiseDistance);
+        let [collision, distance, sumOfRaddi, dx , dy] = this.game.checkcollision(this, this.game.player);
+        if (distance < this.noiseDistance) {
+            this.volumeLevel = 1-(distance / this.noiseDistance);
         } else {
             this.volumLevel = 0;
         }

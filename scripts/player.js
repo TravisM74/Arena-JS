@@ -20,7 +20,8 @@ export class Player {
         this.healthBar = new HealthBar(this);
         this.walkingSound = new Audio('../audio/footstep00.ogg')
         this.deathSound = new Audio('../audio/aargh0.ogg');
-        this.takeSound = new Audio('../audio/take.wav');
+        this.levelUpSound = new Audio('../audio/levelup.wav');
+        
         this.img = document.getElementById('hr1');
 
         this.pTimer =0;
@@ -38,14 +39,13 @@ export class Player {
             ctx.stroke();
         }
         this.drawFacing(ctx);
-        
         if (!this.game.debugMode) ctx.drawImage(this.img, this.x- this.width * 0.5, this.y -this.height *0.5, this.width, this.height);
         this.healthBar.draw(ctx);
     }
     update(deltaTime){
         
         //Movement
-        this.movement();
+        this.movement(deltaTime);
         //Boundries
         if (this.x > this.game.WIDTH) this.x = this.game.WIDTH;
         if (this.x < 0 ) this.x = 0;
@@ -53,13 +53,10 @@ export class Player {
         if (this.y > this.game.HEIGHT) this.y = this.game.HEIGHT;
 
         this.levelCheck();
-        //moving Particles
-        if (this.pTimer > this.pInterval) {
-            this.game.particles.push(new Dust(this.game, this.x , this.y+ this.height * 0.5));
-            this.pTimer= 0;
-        } else {
-            this.pTimer += deltaTime;
-        }
+        this.itemCollection();
+        
+    }
+    itemCollection(){
         //collision with item
         this.game.items.forEach((item) => {
             let [collision,distance, sumOfRadii, dx ,dy] = this.game.checkcollision(this, item);
@@ -67,10 +64,20 @@ export class Player {
                 //picked up
                 item.activate();
                 this.game.displayHits.push(new ItemGain(this, '+1 Potion'));
-                if (this.game.soundMode) this.takeSound.play();
+                if (this.game.soundMode) this.game.takeSound.play();
                 item.markedForDeletion = true;
             }
         });
+
+    }
+    creatDust(deltaTime){
+        if (this.pTimer > this.pInterval) {
+            this.game.particles.push(new Dust(this.game, this.x , this.y+ this.height * 0.5));
+            this.pTimer= 0;
+        } else {
+            this.pTimer += deltaTime;
+        }
+
     }
 
     drawFacing(ctx){
@@ -115,27 +122,31 @@ export class Player {
         ctx.fill(); 
     }
 
-    movement(){
+    movement(deltaTime){
         if (((this.game.input.keys.indexOf('ArrowDown') > -1) || (this.game.input.keys.indexOf('s') > -1)) && ((this.state==='adventuring') && (this.game.enemies.length > 0))) {
             this.y+= this.game.gameSpeed;
             this.facing='south';
             if (this.game.soundMode) this.walkingSound.play();
+            this.creatDust(deltaTime);
         }
         if (((this.game.input.keys.indexOf('ArrowRight') > -1) || (this.game.input.keys.indexOf('d') > -1)) && ((this.state==='adventuring')  && (this.game.enemies.length > 0))){
             this.x+= this.game.gameSpeed;
             this.facing='east';  
-            if (this.game.soundMode) this.walkingSound.play();   
+            if (this.game.soundMode) this.walkingSound.play();  
+            this.creatDust(deltaTime); 
         } 
         
         if (((this.game.input.keys.indexOf('ArrowLeft') > -1) || (this.game.input.keys.indexOf('a') > -1)) && ((this.state==='adventuring')  && (this.game.enemies.length > 0))) {
             this.x-= this.game.gameSpeed;
             this.facing='west';
             if (this.game.soundMode) this.walkingSound.play();
+            this.creatDust(deltaTime);
         }
         if (((this.game.input.keys.indexOf('ArrowUp') > -1)  || (this.game.input.keys.indexOf('w') > -1)) && ((this.state==='adventuring')  && (this.game.enemies.length > 0))){
             this.y-= this.game.gameSpeed;
             this.facing='north';
             if (this.game.soundMode) this.walkingSound.play();
+            this.creatDust(deltaTime);
         }
     }
     playerResting(deltaTime){
@@ -201,6 +212,7 @@ export class Player {
         document.getElementById('health-pot-charges').innerText=`${this.healthPotions}`;
     }
     levelUp(){
+        if (this.game.soundMode) this.levelUpSound.play();
         this.level++;
         document.getElementById('level-count').innerText=`${this.level}`;
         this.thac0Bonus++;

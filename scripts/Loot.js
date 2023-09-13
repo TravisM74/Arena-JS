@@ -5,6 +5,7 @@ export class Loot {
         this.ACbuffCount = 2;
         this.strengthBuffcount = 4;
         this.speedBuffCount = 5;
+        this.upgradeSound = new Audio('../audio/upgrade.wave');
         
     }
     getLoot(){
@@ -24,6 +25,7 @@ export class Loot {
     }
     checkArmourUpgradeLoot(){
         if ((Math.random() < 0.05 ) &&(this.ACbuffCount > 0 )) {
+            if (this.game.soundMode) this.upgradeSound.play();
             this.game.displayHits.push(new ItemGain(this.game.player, 'AC Improved')); 
             this.game.player.armourClass--;
             this.ACbuffCount--;
@@ -31,7 +33,8 @@ export class Loot {
         }
     }
     strengthBuff(){
-        if ((Math.random() < 0.08 ) &&(this.strengthBuffcount > 0 )) {
+        if ((Math.random() < 0.05 ) &&(this.strengthBuffcount > 0 )) {
+            if (this.game.soundMode) this.upgradeSound.play();
             this.game.player.bonusDamage++;
             this.strengthBuffcount--;
             this.game.displayHits.push(new ItemGain(this.game.player, 'Strength Improved')); 
@@ -54,7 +57,8 @@ export class Loot {
         }
     }
     speedBuff(){
-        if ((Math.random() < 0.08 ) &&(this.strengthBuffcount > 0 )) {
+        if ((Math.random() < 0.03 ) &&(this.strengthBuffcount > 0 )) {
+            if (this.game.soundMode) this.upgradeSound.play();
             this.game.player.attackInterval -= 100;
             this.speedBuffCount--;
             this.game.displayHits.push(new ItemGain(this.game.player, 'Attack Speed Improved')); 
