@@ -92,11 +92,11 @@ export class MeleeCombat2 {
                     
                 } 
                 //console.log(this.roll,a);
-                if (this.game.soundMode) this.hitSound1.play();
+                if (this.game.soundMode) this.e.hitSound.play();
             } else {
                 //console.log(this.roll, 'miss', a)
                 this.damageTaken = 0;
-                if (this.game.soundMode) this.missSound2.play();
+                if (this.game.soundMode) this.e.missSound.play();
                 //display miss
                 this.game.displayHits.push(new HitUI( this.e,this.game.player, this.damageTaken));
             }
@@ -136,6 +136,7 @@ export class MeleeCombat2 {
             this.game.enemies = [];
             this.enemiesInCombat = [];
             this.game.enemyCount--;
+            this.game.wave--;
             this.game.player.defeatedInCombat = true;
         }          
         

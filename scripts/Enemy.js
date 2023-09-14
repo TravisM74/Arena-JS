@@ -30,8 +30,13 @@ export class Enemy {
         this.pTimer = 0;
         this.pInterval= 200;
         this.afterItems = true;
-     
+        
         this.healthBar = new HealthBar(this);
+
+        this.walkingSoundTimer = 0;
+        this.walkingSoundInterval = 1200;
+        this.missSound = new Audio('../audio/swosh-04.flac');
+        this.hitSound = new Audio('../audio/5.ogg');
        
     }
     draw(ctx){
@@ -58,9 +63,18 @@ export class Enemy {
     }
     update(deltaTime){
         this.createDustParticles(deltaTime);
+        this.setFacing();
         
         this.sound1.volume = this.soundVolume();
-        if (this.game.soundMode) this.sound1.play();
+        if (this.game.soundMode) {
+            if (this.walkingSoundTimer > this.walkingSoundInterval){
+                this.sound1.play();
+                this.walkingSoundTimer = 0;
+            } else {
+                this.walkingSoundTimer += deltaTime;
+            }
+
+        }
         this.huntForItem();
         //distance froim target
         this.dx = this.moveToX - this.x;
@@ -77,6 +91,11 @@ export class Enemy {
         this.itemInteraction();
         this.checkEnemyCollision();
         
+    }
+    setFacing() {
+        (this.x < this.moveToX) ? this.facing= 'east': this.facing = 'west';
+        (this.y > this.moveToX) ? this.facing= 'north': this.facing = 'south';
+
     }
     huntForItem(){
         // target player if no items at all
@@ -169,19 +188,22 @@ export class Skeleton extends Enemy {
         this.armourClass = 9;
         this.weaponDamage = 4;
         this.coins = Math.floor(Math.random()* 15);
-        this.sound1 = new Audio('../audio/mnstr9.wav');
-        this.deathSound = new Audio('../audio/Falling Bones.wav');
         this.attackInterval = 1800;
         this.moveBase = this.game.gameSpeed * 0.02 ;
         this.moveSpeed = this.moveBase + (this.game.enemyCount *.05 ) + (this.moveVariance);
         //console.log(this.moveBase, this.moveVariance,this.moveSpeed);
         this.moveVariance = Math.random() *  .6;
+        this.sound1 = new Audio('../audio/mnstr9.wav');
+        this.deathSound = new Audio('../audio/Falling Bones.wav');
         this.evilTakeSound = new Audio('../audio/witch_cackle-1.ogg');
+        this.missSound = new Audio('../audio/swosh-04.flac');
+        this.hitSound = new Audio('../audio/5.ogg');
         this.afterItems = true;
         
     }
     draw(ctx){
         super.draw(ctx);
+
         ctx.drawImage(this.image, this.x - this.width * 0.5, this.y - this.height * 0.5);
         
     }
@@ -193,5 +215,77 @@ export class Skeleton extends Enemy {
             this.volumLevel = 0;
         }
         return this.volumeLevel;
+    }
+}
+export class Troll extends Enemy {
+    constructor(game, level){
+        super(game, level);
+        this.image = document.getElementById('troll');
+        this.width = 48;
+        this.height = 64;
+        this.maxFrame = 3;
+        this.frameX = 0;
+        this.frameY = 0;
+        this.frameXInterval = 500;
+        this.frameXTimer = 0;
+
+        this.name ='troll';
+        this.experiance = 500 * this.level;
+        this.meleeCombatRadius = 25;
+        this.level = Math.floor(Math.random() * 3)+3;
+        this.maxHitPoints = this.calculateHitPoints();
+        this.hitPoints = this.maxHitPoints;
+    
+        this.armourClass = 5;
+        this.weaponDamage = 8;
+        this.coins = Math.floor(Math.random()* 15);
+        this.walkingSoundInterval = 1300;
+        this.attackInterval = 1800;
+        this.moveBase = this.game.gameSpeed * 0.02 ;
+        this.moveSpeed = this.moveBase + (this.moveVariance);
+        //console.log(this.moveBase, this.moveVariance,this.moveSpeed);
+        this.moveVariance = Math.random() *  .6;
+        this.afterItems = false;
+    
+        this.evilTakeSound = new Audio('../audio/witch_cackle-1.ogg');
+        this.deathSound = new Audio('../audio/die2.wav');
+        this.sound1 = new Audio('../audio/trollfoot.wav');
+        this.missSound = new Audio('../audio/swosh-29.flac');
+        
+    }
+    draw(ctx){
+        super.draw(ctx);
+        if (this.facing === 'north') this.frameY= 0;
+        if (this.facing === 'east') this.frameY= 1;
+        if (this.facing === 'south') this.frameY= 2;
+        if (this.facing === 'west') this.frameY= 3;
+        
+        ctx.drawImage(this.image, 
+            this.width * this.frameX, this.height * this.frameY, this.width, this.height, 
+            this.x - (this.width * .5), this.y - (this.height * .5) , this.width , this.height );
+        
+    }
+    soundVolume(){
+        let [collision, distance, sumOfRaddi, dx , dy] = this.game.checkcollision(this, this.game.player);
+        if (distance < this.noiseDistance) {
+            this.volumeLevel = 1-(distance / this.noiseDistance);
+        } else {
+            this.volumLevel = 0;
+        }
+        return this.volumeLevel;
+    }
+    update(deltaTime){
+        super.update(deltaTime);
+        if(this.frameXTimer > this.frameXInterval){
+            this.frameXTimer = 0;
+            if (this.frameX < 2){
+                this.frameX++;
+            } else {
+                this.frameX= 0;
+            }
+        } else {
+            this.frameXTimer += deltaTime;
+        }
+        
     }
 }

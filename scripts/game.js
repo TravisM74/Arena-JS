@@ -1,7 +1,7 @@
 import {Player} from './player.js';
 import {InputHandler} from './input.js';
 import {DebugUI} from './debugUI.js';
-import {Enemy, Skeleton} from './Enemy.js';
+import {Enemy, Skeleton, Troll} from './Enemy.js';
 import {MeleeCombat2} from './meleeconflict.js'
 import {HitUI, HealUI, ItemGain} from './hitUI.js';
 import {PlayerUI} from './playerUI.js';
@@ -161,6 +161,9 @@ export class Game {
     addNewEnemies(){
         for(let i = 0 ; i < this.enemyCount ; i++){
             this.enemies.push(new Skeleton(this, 1));   
+        }
+        if (this.wave % 5 === 0){
+            this.enemies.push(new Troll(this,Math.floor(this.wave / 5)));
         }
         document.getElementById('wave-count').innerText= `Wave :${this.wave}`;
         this.enemyCount++;
