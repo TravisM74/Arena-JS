@@ -29,7 +29,7 @@ export class Game {
         this.soundMode = true;
 
         this.waveWindowTimer = 0;
-        this.waveWindowInterval = 4000;
+        this.waveWindowInterval = 2000;
        
         this.reset();
         
@@ -43,13 +43,7 @@ export class Game {
         this.player.update(deltaTime);
         this.debugUI.update(timeStamp);
         this.playerUI.update();
-        // end game condition
-        if (this.player.lives === 0){
-            this.gameOver= true;
-            this.gamePause= true;  
-            this.loseSound.play();
-        } 
-        
+        this.checkGameOver();
         this.clearMarkedForDelete();
         //items
         this.itemSpawning(deltaTime); 
@@ -105,25 +99,36 @@ export class Game {
         if (this.player.lives === 0){
             this.gameOverWindow.draw(ctx);
         }  
-        if((this.enemies.length === 0)&&(this.gamePause) && (!this.gameOver) && (this.waveWindowTimer > this.waveWindowInterval)){
-            
+        if((this.enemies.length === 0)
+            &&(this.gamePause) 
+            && (!this.gameOver) 
+            && (this.waveWindowTimer > this.waveWindowInterval)){   
             this.waveWindow.draw(ctx);
         }
 
     }
+    checkGameOver(){
+        // end game condition
+        if (this.player.lives === 0){
+            this.gameOver= true;
+            this.gamePause= true;  
+            if (!this.gameOverMusicPlayed) {
+                this.loseSound.play();
+                this.gameOverMusicPlayed = !this.gameOverMusicPlayed;
+            }
+        } 
+    }
 
     reset(){
-        this.enemyCount = 1
+        this.enemyCount = 1;
+        this.wave = 1;
         this.enemies = [];
         this.displayHits = [];
-        
         this.items = [];
         this.itemTimer = 0;
-        this.itemInterval = 5000;
-            
-       this.particles = [];
-       this.hitParticles =[];
-
+        this.itemInterval = 5000;    
+        this.particles = [];
+        this.hitParticles =[];
         this.gameOver = false;
         this.gamePause = false;
     }
@@ -137,10 +142,11 @@ export class Game {
         this.potionSpawnSound = new Audio('../audio/bubble.wav');
         this.takeSound = new Audio('../audio/take.wav');
         this.loseSound = new Audio('../audio/lose.wav');
+        this.gameOverMusicPlayed = false;
        
     }
     handlingPlayerRestingState(deltaTime){
-        if ((this.player.state === 'ko')||(this.player.state === 'resting' )&&(this.enemies.length > 0) ){
+        if ((this.player.state === 'ko')||(this.player.state === 'resting' )){
             this.player.playerResting(deltaTime);
         } 
         
@@ -156,8 +162,9 @@ export class Game {
         for(let i = 0 ; i < this.enemyCount ; i++){
             this.enemies.push(new Skeleton(this, 1));   
         }
-        document.getElementById('wave-count').innerText= `Wave :${this.enemyCount}`;
+        document.getElementById('wave-count').innerText= `Wave :${this.wave}`;
         this.enemyCount++;
+        this.wave++;
         
     }
     

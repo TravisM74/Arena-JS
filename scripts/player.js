@@ -7,16 +7,18 @@ export class Player {
         this.width = 32;
         this.height= 32;
         this.reset();
+        // also used as pickup radius
         this.meleeCombatRadius = 20;
         
         this.attackTimer = 0;
         this.restInterval = 1000;
         this.restTime= 0;
+        this.thac0Bonus = 0;
+        
         this.mainHand = 'fist';
         this.offHand = 'fist';
         this.armour = 'leather';
-        this.thac0Bonus = 0;
-        
+
         this.healthBar = new HealthBar(this);
         this.walkingSound = new Audio('../audio/footstep00.ogg')
         this.deathSound = new Audio('../audio/aargh0.ogg');
@@ -157,8 +159,7 @@ export class Player {
                 this.hitPoints ++;
                 this.game.displayHits.push(new HealUI(this, 1));
             }
-            if (this.hitPoints === this.maxHitPoints) this.state='adventuring';
-           
+            if (this.hitPoints === this.maxHitPoints) this.state='adventuring';   
         } else {
             this.restTime += deltaTime;
         }
@@ -191,7 +192,8 @@ export class Player {
     }
     healWithPotion() {
         console.log('button activated script')
-        if(this.healthPotions > 0) {
+        if((this.healthPotions > 0) && (this.hitPoints !== this.maxHitPoints)) {
+
             this.healthPotions--;
             document.getElementById('health-pot-charges').innerText=`${this.healthPotions}`;
             if (this.hitPoints < this.maxHitPoints * 0.5){

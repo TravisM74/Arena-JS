@@ -24,7 +24,7 @@ export class Loot {
         }
     }
     checkArmourUpgradeLoot(){
-        if ((Math.random() < 0.05 ) &&(this.ACbuffCount > 0 )) {
+        if ((Math.random() < 0.04 ) &&(this.ACbuffCount > 0 )) {
             if (this.game.soundMode) this.upgradeSound.play();
             this.game.displayHits.push(new ItemGain(this.game.player, 'AC Improved')); 
             this.game.player.armourClass--;
@@ -33,7 +33,7 @@ export class Loot {
         }
     }
     strengthBuff(){
-        if ((Math.random() < 0.05 ) &&(this.strengthBuffcount > 0 )) {
+        if ((Math.random() < 0.04 ) &&(this.strengthBuffcount > 0 )) {
             if (this.game.soundMode) this.upgradeSound.play();
             this.game.player.bonusDamage++;
             this.strengthBuffcount--;

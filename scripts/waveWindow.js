@@ -12,20 +12,23 @@ export class WaveWindow {
         this.color = `rgb(0,0,${this.blueColor})`;
     }
     draw(ctx){
-        if (this.display) ctx.clearRect(0,0,this.game.WIDTH,this.game.HEIGHT);
-        ctx.save();
-        
-        ctx.shadowOffsetX = 1;
-        ctx.shadowOffsetY = 1;
-        ctx.shadowColor = 'black';
-        ctx.font = 'bold 30px serif';
-        ctx.fillStyle = 'green';
-        if ((this.display)&&(!this.game.player.defeatedInCombat)) ctx.fillText('Wave ' + (this.game.enemyCount-1) + ' Complete', this.startX , this.startY );
-        if (this.display) ctx.fillText(this.game.player.lives +' Lives Remaning', this.startX , this.startY + 30);
-        ctx.fillStyle= this.color;
-        if (this.display) ctx.fillText('"space"' , this.startX +40 , this.startY + 60);
-        ctx.fillStyle = 'green';
-        if (this.display) ctx.fillText(' to continue ...' , this.startX , this.startY + 90);
+        if (this.display) {
+            ctx.clearRect(0,0,this.game.WIDTH,this.game.HEIGHT);
+            ctx.save();
+            
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 1;
+            ctx.shadowColor = 'black';
+            ctx.font = 'bold 30px serif';
+            ctx.fillStyle = 'green';
+            if ((this.display)&&(!this.game.player.defeatedInCombat)) ctx.fillText('Wave ' + (this.game.enemyCount-1) + ' Complete', this.startX , this.startY );
+            ctx.fillText(this.game.player.lives +' Lives Remaning', this.startX , this.startY + 30);
+            ctx.fillStyle= this.color;
+            ctx.fillText('"space"' , this.startX +40 , this.startY + 60);
+            ctx.fillStyle = 'green';
+            ctx.fillText(' to continue ...' , this.startX , this.startY + 90);
+
+        }
         
     }
     update(deltaTime){

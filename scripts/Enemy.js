@@ -9,10 +9,10 @@ export class Enemy {
         this.meleeCombatRadius = 20;
         this.markedForDeletion = false;
         this.inCombat = false;
-        this.moveBase = this.game.gameSpeed * 0.02 ;
-        this.moveSpeed = this.moveBase + (this.game.enemyCount *.05 ) + (this.moveVariance);
+        this.moveBase = this.game.gameSpeed * 0.04;
+        this.moveVariance = Math.random() *  0.08
+        this.moveSpeedModifer = this.moveBase + (this.game.enemyCount *.05 ) + (this.moveVariance);
        
-        this.moveVariance = Math.random() *  .6;
         this.level = level;
         this.thac0Bonus = this.level -1;
         this.moveInterval = 1000;
@@ -29,6 +29,7 @@ export class Enemy {
         this.noiseDistance = 400;
         this.pTimer = 0;
         this.pInterval= 200;
+        this.afterItems = true;
      
         this.healthBar = new HealthBar(this);
        
@@ -60,22 +61,43 @@ export class Enemy {
         
         this.sound1.volume = this.soundVolume();
         if (this.game.soundMode) this.sound1.play();
-        this.moveToX = this.game.player.x;
-        this.moveToY = this.game.player.y;
+        this.huntForItem();
+        //distance froim target
+        this.dx = this.moveToX - this.x;
+        this.dy = this.moveToY - this.y;
+        //calculate a move portion of that distance
+        const distance = Math.hypot(this.dy,this.dx);
+        // move that distance by this portion
+        this.xspeed =  this.dx / distance || 0;
+        this.yspeed =  this.dy / distance || 0;
+        //modify the speed at which they move that distance
+        this.x += this.xspeed * this.moveSpeedModifer ;
+        this.y += this.yspeed * this.moveSpeedModifer;
 
-        if ((this.x < this.game.player.x)) {
-            this.x += this.moveToX / (this.moveInterval / this.moveSpeed);
-        } else {
-            this.x -= this.moveToX / (this.moveInterval / this.moveSpeed);
-        }
-        if ((this.y < this.game.player.y)) {
-            this.y += this.moveToY / (this.moveInterval / this.moveSpeed);
-        } else {
-            this.y -= this.moveToY / (this.moveInterval / this.moveSpeed);
-        }
         this.itemInteraction();
         this.checkEnemyCollision();
         
+    }
+    huntForItem(){
+        // target player if no items at all
+        if (this.game.items.length < 1) {
+            this.moveToX = this.game.player.x;
+            this.moveToY = this.game.player.y;
+        }
+        //see if the item is closer then the player, target closest
+        if (this.afterItems) {
+            this.game.items.forEach((item) => {
+                let [collision,distance, sumOfRadii, dx ,dy] = this.game.checkcollision(this, item);
+                let [collisionPlayer,distancePlayer, sumOfRadiiPlayer, dxPlayer ,dyPlayer] = this.game.checkcollision(this, this.game.player);
+                if (distance < distancePlayer) { 
+                    this.moveToX = item.x;
+                    this.moveToY = item.y;
+                } else {
+                    this.moveToX = this.game.player.x;
+                    this.moveToY = this.game.player.y;
+                }
+            });
+        }
     }
 
     itemInteraction(){
@@ -155,6 +177,7 @@ export class Skeleton extends Enemy {
         //console.log(this.moveBase, this.moveVariance,this.moveSpeed);
         this.moveVariance = Math.random() *  .6;
         this.evilTakeSound = new Audio('../audio/witch_cackle-1.ogg');
+        this.afterItems = true;
         
     }
     draw(ctx){
