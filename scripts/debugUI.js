@@ -24,6 +24,7 @@ export class DebugUI {
         context.fillText('Player combat : ' + this.game.player.inCombat, this.startX , this.startY + 140);
         context.fillText('Sounds : ' + this.game.soundMode, this.startX , this.startY + 160);
         context.fillText('in combat with  : ' + this.game.meleeCombat.enemiesInCombat.length, this.startX , this.startY + 180);
+        context.fillText('wave complete  : ' + this.game.waveComplete, this.startX , this.startY + 200);
         context.restore();
 
     }

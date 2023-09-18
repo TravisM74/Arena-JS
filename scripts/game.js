@@ -30,7 +30,7 @@ export class Game {
 
         this.waveWindowTimer = 0;
         this.waveWindowInterval = 2000;
-       
+        
         this.reset();
         
         this.meleeCombat = new MeleeCombat2(this);
@@ -38,12 +38,17 @@ export class Game {
         this.buttonConfig();
         this.audioConfig();  
     }
-   
-    update(timeStamp,deltaTime){   
+    
+    update(timeStamp,deltaTime){  
+        
+        this.checkGameOver();
+        (this.enemies.length > 0) ? this.waveComplete = false : this.waveComplete = true;
+        if (!this.waveComplete){
+        }
+            
         this.player.update(deltaTime);
         this.debugUI.update(timeStamp);
         this.playerUI.update();
-        this.checkGameOver();
         this.clearMarkedForDelete();
         //items
         this.itemSpawning(deltaTime); 
@@ -60,7 +65,6 @@ export class Game {
         });
         
         this.handlingPlayerRestingState(deltaTime);
-        this.addingEnemiesCheck();
         this.meleeCombatCheck(deltaTime); 
         // handle Particles
         this.particles.forEach((p)=> {p.update(deltaTime);            
@@ -68,11 +72,14 @@ export class Game {
         this.hitParticles.forEach((p)=> {p.update(deltaTime);            
         });
         //handle Windows updates
+        
         this.waveWindow.update(deltaTime);
         this.gameOverWindow.update(deltaTime);
-        if((this.enemies.length === 0)&&(this.gamePause) && (!this.gameOver)){
-        this.waveWindowTimer += deltaTime;
+        if((this.enemies.length === 0) && (!this.gameOver)){
+            this.waveWindowTimer += deltaTime;
+           
         }
+        /* this.addingEnemiesCheck(); */
         
     }
     draw(ctx){
@@ -96,47 +103,39 @@ export class Game {
         this.hitParticles.forEach((p)=> {p.draw(ctx);});
 
         //Wave Window Display 
+        if ((this.gameWin)&&  this.waveComplete){
+            console.log('game win ' + this.gameWin  + 'Wave :'+ this.wave);  
+            this.gameOverWindow.draw(ctx);
+        }
         if (this.player.lives === 0){
             this.gameOverWindow.draw(ctx);
         }  
         if((this.enemies.length === 0)
-            &&(this.gamePause) 
-            && (!this.gameOver) 
-            && (this.waveWindowTimer > this.waveWindowInterval)){   
+            && (this.waveWindowTimer > this.waveWindowInterval)
+            && (!this.gameWin)){   
             this.waveWindow.draw(ctx);
         }
+        
+    }
+    addingEnemiesCheck(){
+        if((this.enemies.length < 1) && (!this.wavePause )){
+                this.addNewEnemies();
+                this.wavePause = true;
 
+        };
     }
-    checkGameOver(){
-        // end game condition
-        if (this.player.lives === 0){
-            this.gameOver= true;
-            this.gamePause= true;  
-            if (!this.gameOverMusicPlayed) {
-                this.loseSound.play();
-                this.gameOverMusicPlayed = !this.gameOverMusicPlayed;
-            }
-        } 
-    }
-
-    reset(){
-        this.enemyCount = 1;
-        this.wave = 1;
-        this.enemies = [];
-        this.displayHits = [];
-        this.items = [];
-        this.itemTimer = 0;
-        this.itemInterval = 5000;    
-        this.particles = [];
-        this.hitParticles =[];
-        this.gameOver = false;
-        this.gamePause = false;
-    }
-    buttonConfig(){
-        const restButton = document.getElementById('rest-button');
-        restButton.onclick = (() => this.player.state='resting'); 
-        const healthPotionButton = document.getElementById('health-potion-button');
-        healthPotionButton.onclick = (()=> this.player.healWithPotion());
+    addNewEnemies(){
+        this.enemyCount++;
+        this.wave++;
+        for(let i = 0 ; i < this.enemyCount ; i++){
+            this.enemies.push(new Skeleton(this, 1));   
+        }
+        
+        if ( this.wave % 3 === 0){
+            this.enemies.push(new Troll(this,Math.floor(this.wave / 3)));
+        }
+        document.getElementById('wave-count').innerText= `Wave :${this.wave}`;
+        
     }
     audioConfig(){
         this.potionSpawnSound = new Audio('../audio/bubble.wav');
@@ -145,30 +144,66 @@ export class Game {
         this.gameOverMusicPlayed = false;
        
     }
+    buttonConfig(){
+        const restButton = document.getElementById('rest-button');
+        restButton.onclick = (() => this.player.state='resting'); 
+        const healthPotionButton = document.getElementById('health-potion-button');
+        healthPotionButton.onclick = (()=> this.player.healWithPotion());
+    }
+    checkcollision(a,b){
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distance = Math.hypot(dy,dx);
+        const sumOfRadii = a.meleeCombatRadius + b.meleeCombatRadius ;
+        return [(distance < sumOfRadii),distance, sumOfRadii, dx ,dy];
+    }
+    checkDistance(a,b){
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distance = Math.hypot(dy,dx);
+        const sumOfRadii = a.meleeCombatRadius + b.meleeCombatRadius ;
+        return [(distance < sumOfRadii)];
+    }
+    checkGameOver(){
+        // end game condition
+        //console.log(this.wave);
+        if (this.wave === 15){
+            this.gameWin = true;   
+        }
+        if (this.player.lives === 0){
+            this.gameOver= true;
+              
+            if (!this.gameOverMusicPlayed) {
+                this.loseSound.play();
+                this.gameOverMusicPlayed = !this.gameOverMusicPlayed;
+            }
+        } 
+    }
+    clearMarkedForDelete(){
+        this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
+        this.displayHits = this.displayHits.filter(d => !d.markedForDeletion);
+        this.items = this.items.filter(d => !d.markedForDeletion);
+        this.particles = this.particles.filter(p => !p.markedForDeletion);
+        this.hitParticles = this.hitParticles.filter(p => !p.markedForDeletion);
+    }
     handlingPlayerRestingState(deltaTime){
         if ((this.player.state === 'ko')||(this.player.state === 'resting' )){
             this.player.playerResting(deltaTime);
         } 
         
     }
-    addingEnemiesCheck(){
-        if((this.enemies.length < 1) &&(!this.gamePause )){
-            this.addNewEnemies();
-            this.gamePause = true;
-            //console.log(this.checkContact(this.player,this.enemies));
-        };
-    }
-    addNewEnemies(){
-        for(let i = 0 ; i < this.enemyCount ; i++){
-            this.enemies.push(new Skeleton(this, 1));   
+    itemSpawning(deltaTime){
+        if (this.itemTimer > this.itemInterval) {
+            this.itemTimer = 0;
+            if ((Math.random() < .10)&&(this.enemies.length > 0)) {
+                this.newItem= new Potion(this);
+                
+                this.items.push(this.newItem) ;
+                if (this.soundMode) this.potionSpawnSound.play();
+            } 
+        } else {
+            this.itemTimer += deltaTime;
         }
-        if (this.wave % 5 === 0){
-            this.enemies.push(new Troll(this,Math.floor(this.wave / 5)));
-        }
-        document.getElementById('wave-count').innerText= `Wave :${this.wave}`;
-        this.enemyCount++;
-        this.wave++;
-        
     }
     
     meleeCombatCheck(deltaTime){
@@ -194,47 +229,29 @@ export class Game {
                 e.attackTimer=0;
             } else {
                 e.attackTimer += deltaTime;
-            }
+            } 
         }); 
         this.meleeCombat.playerStatusCheck();
     }
     
-    clearMarkedForDelete(){
-        this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
-        this.displayHits = this.displayHits.filter(d => !d.markedForDeletion);
-        this.items = this.items.filter(d => !d.markedForDeletion);
-        this.particles = this.particles.filter(p => !p.markedForDeletion);
-        this.hitParticles = this.hitParticles.filter(p => !p.markedForDeletion);
-    }
-    checkDistance(a,b){
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
-        const distance = Math.hypot(dy,dx);
-        const sumOfRadii = a.meleeCombatRadius + b.meleeCombatRadius ;
-        return [(distance < sumOfRadii)];
-    }
-   checkcollision(a,b){
-       const dx = a.x - b.x;
-       const dy = a.y - b.y;
-       const distance = Math.hypot(dy,dx);
-       const sumOfRadii = a.meleeCombatRadius + b.meleeCombatRadius ;
-       return [(distance < sumOfRadii),distance, sumOfRadii, dx ,dy];
+    reset(){
+        this.enemyCount = 0;
+        this.wave = 0;
+        this.enemies = [];
+        this.displayHits = [];
+        this.items = [];
+        this.itemTimer = 0;
+        this.itemInterval = 5000;    
+        this.particles = [];
+        this.hitParticles =[];
+        this.gameOver = false;
+        this.gameWin = false;
+        this.wavePause = true;
+        this.waveComplete = true;
     }
     
     
-    itemSpawning(deltaTime){
-        if (this.itemTimer > this.itemInterval) {
-            this.itemTimer = 0;
-            if ((Math.random() < .10)&&(this.enemies.length > 0)) {
-                this.newItem= new Potion(this);
-                
-                this.items.push(this.newItem) ;
-                if (this.soundMode) this.potionSpawnSound.play();
-            } 
-        } else {
-            this.itemTimer += deltaTime;
-        }
-    }
+    
   
     
 }

@@ -15,8 +15,9 @@ export class Enemy {
        
         this.level = level;
         this.thac0Bonus = this.level -1;
-        this.moveInterval = 1000;
-        this.moveTimer = 0;
+
+        this.maxHitPoints = this.calculateHitPoints();
+        this.hitPoints = this.maxHitPoints; 
         
         this.attacks = 1;
         this.attackTimer = 0;
@@ -27,16 +28,25 @@ export class Enemy {
         this.loc= this.game.checkDistance(this,this.game.player);
         this.volumeLevel=0;
         this.noiseDistance = 400;
+        //particle timer
         this.pTimer = 0;
         this.pInterval= 200;
+        //Ai
         this.afterItems = true;
+        this.lootRollBonus = 0;
         
         this.healthBar = new HealthBar(this);
 
         this.walkingSoundTimer = 0;
-        this.walkingSoundInterval = 1200;
+        // skeleton sounds default
         this.missSound = new Audio('../audio/swosh-04.flac');
         this.hitSound = new Audio('../audio/5.ogg');
+        this.walkingSoundInterval = 1000;
+        this.walkingSound = new Audio('../audio/mnstr9.wav');
+        this.deathSound = new Audio('../audio/Falling Bones.wav');
+        this.evilTakeSound = new Audio('../audio/witch_cackle-1.ogg');
+       
+       
        
     }
     draw(ctx){
@@ -65,10 +75,10 @@ export class Enemy {
         this.createDustParticles(deltaTime);
         this.setFacing();
         
-        this.sound1.volume = this.soundVolume();
+        this.walkingSound.volume = this.soundVolume();
         if (this.game.soundMode) {
             if (this.walkingSoundTimer > this.walkingSoundInterval){
-                this.sound1.play();
+                this.walkingSound.play();
                 this.walkingSoundTimer = 0;
             } else {
                 this.walkingSoundTimer += deltaTime;
@@ -99,7 +109,7 @@ export class Enemy {
     }
     huntForItem(){
         // target player if no items at all
-        if (this.game.items.length < 1) {
+        if ((this.game.items.length < 1)||(!this.afterItems)) {
             this.moveToX = this.game.player.x;
             this.moveToY = this.game.player.y;
         }
@@ -182,8 +192,8 @@ export class Skeleton extends Enemy {
         this.experiance = 200 * this.level;
         this.meleeCombatRadius = 20;
         
-        this.maxHitPoints = this.calculateHitPoints();
-        this.hitPoints = this.maxHitPoints;
+        /* this.maxHitPoints = this.calculateHitPoints();
+        this.hitPoints = this.maxHitPoints; */
     
         this.armourClass = 9;
         this.weaponDamage = 4;
@@ -193,12 +203,14 @@ export class Skeleton extends Enemy {
         this.moveSpeed = this.moveBase + (this.game.enemyCount *.05 ) + (this.moveVariance);
         //console.log(this.moveBase, this.moveVariance,this.moveSpeed);
         this.moveVariance = Math.random() *  .6;
-        this.sound1 = new Audio('../audio/mnstr9.wav');
+        this.walkingSoundInterval = 1000;
+        this.walkingSound = new Audio('../audio/mnstr9.wav');
         this.deathSound = new Audio('../audio/Falling Bones.wav');
         this.evilTakeSound = new Audio('../audio/witch_cackle-1.ogg');
         this.missSound = new Audio('../audio/swosh-04.flac');
         this.hitSound = new Audio('../audio/5.ogg');
         this.afterItems = true;
+        this.lootRollBonus = 0;
         
     }
     draw(ctx){
@@ -232,24 +244,26 @@ export class Troll extends Enemy {
         this.name ='troll';
         this.experiance = 500 * this.level;
         this.meleeCombatRadius = 25;
-        this.level = Math.floor(Math.random() * 3)+3;
-        this.maxHitPoints = this.calculateHitPoints();
-        this.hitPoints = this.maxHitPoints;
+        
+
+        /* this.maxHitPoints = this.calculateHitPoints();
+        this.hitPoints = this.maxHitPoints; */
     
         this.armourClass = 5;
         this.weaponDamage = 8;
         this.coins = Math.floor(Math.random()* 15);
-        this.walkingSoundInterval = 1300;
         this.attackInterval = 1800;
         this.moveBase = this.game.gameSpeed * 0.02 ;
+        this.moveVariance = Math.random() *  .3;
         this.moveSpeed = this.moveBase + (this.moveVariance);
-        //console.log(this.moveBase, this.moveVariance,this.moveSpeed);
-        this.moveVariance = Math.random() *  .6;
+        
+        
         this.afterItems = false;
-    
+        this.lootRollBonus = .05;
         this.evilTakeSound = new Audio('../audio/witch_cackle-1.ogg');
         this.deathSound = new Audio('../audio/die2.wav');
-        this.sound1 = new Audio('../audio/trollfoot.wav');
+        this.walkingSoundInterval = 1300;
+        this.walkingSound = new Audio('../audio/trollfoot.wav');
         this.missSound = new Audio('../audio/swosh-29.flac');
         
     }

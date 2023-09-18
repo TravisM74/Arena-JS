@@ -5,7 +5,8 @@ export class Loot {
         this.ACbuffCount = 2;
         this.strengthBuffcount = 4;
         this.speedBuffCount = 5;
-        this.upgradeSound = new Audio('../audio/upgrade.wave');
+        
+        this.upgradeSound = new Audio('../audio/upgrade.wav');
         
     }
     getLoot(){

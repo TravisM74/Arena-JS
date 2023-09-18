@@ -23,6 +23,8 @@ export class Player {
         this.walkingSound = new Audio('../audio/footstep00.ogg')
         this.deathSound = new Audio('../audio/aargh0.ogg');
         this.levelUpSound = new Audio('../audio/levelup.wav');
+        this.missSound = new Audio('../audio/swosh-01.flac');
+        this.hitSound = new Audio('../audio/5.ogg');
         
         this.img = document.getElementById('hr1');
 

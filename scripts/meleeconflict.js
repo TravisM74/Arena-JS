@@ -7,9 +7,8 @@ export class MeleeCombat2 {
         this.game = game;
         
         this.enemiesInCombat = [];
-        this.missSound = new Audio('../audio/swosh-01.flac');
-        this.missSound2 = new Audio('../audio/swosh-04.flac');
-        this.hitSound1 = new Audio('../audio/5.ogg');
+        
+        
     }
     checkMeleeContact(a,b){
         this.a = a ;
@@ -45,11 +44,11 @@ export class MeleeCombat2 {
                     this.game.displayHits.push(new HitUI(this.game.player, this.enemiesInCombat[0], this.damage));
                     this.game.hitParticles.push(new Hit(this.game, this.enemiesInCombat[0].x, this.enemiesInCombat[0].y ));
                     //console.log(this.roll ,b);
-                    if (this.game.soundMode) this.hitSound1.play();
+                    if (this.game.soundMode) this.game.player.hitSound.play();
                     this.removeDead();
                 } else {
                     //console.log(this.roll, 'miss', b);
-                    if (this.game.soundMode) this.missSound.play();
+                    if (this.game.soundMode) this.game.player.missSound.play();
                     this.damage = 0;
                     //display Miss
                     this.game.displayHits.push(new HitUI(this.game.player, this.enemiesInCombat[0], this.damage));

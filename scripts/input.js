@@ -18,16 +18,17 @@ export class InputHandler{
                         if (e.key === 't') this.game.debugMode = !this.game.debugMode ;
                         if (e.key === 'm') this.game.soundMode = !this.game.soundMode ;
                         if (e.key === 'r') this.game.player.state='resting';
-                        if (((e.key === 'r') && (this.game.gameOver))) {
+                        if (((e.key === 'r') && ((this.game.gameOver) || (this.game.gameWin)))) {
                             this.game.player.reset(); 
                             this.game.reset();  
                         }
                         if ((e.key === 'p')&&(this.game.player.hitPoints !== this.game.player.maxHitPoints)) {
                             this.game.player.healWithPotion();
                         }
-                        //if (e.key ==='Enter') this.game.gamePause = !this.game.gamePause; 
-                        if ((e.key === ' ') && (this.game.gamePause)) {
-                            this.game.gamePause = !this.game.gamePause;
+                      
+                        if ((e.key === ' ') && (!this.game.gameWin)) {
+                            /* this.game.wavePause = !this.game.wavePause; */
+                            this.game.addNewEnemies();
                             if(this.game.player.defeatedInCombat) this.game.player.defeatedInCombat = !this.game.player.defeatedInCombat;
                             this.game.waveWindowTimer = 0;
                         }
