@@ -17,6 +17,9 @@ this is a small java-script game i developed from the larger turn based Java gam
     Trolls
   </li>
 </ul>
+<h3> 
+  Monster ai 
+</h3>
 <p>
   Careful mosters will chase down potions if they are closer to them than you.
 </p>
