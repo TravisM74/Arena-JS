@@ -6,7 +6,7 @@ this is a small java-script game i developed from the larger turn based Java gam
 <p>
   you simply collect potions to heal yourself as needed and figh the waves of monsters untill to reach round 15.
 </p>
-### Monsters Features
+## Monsters Features
 <ul>
   <li>
     Orcs
